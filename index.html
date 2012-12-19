@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>CommonPlay Widget 1.0</title>
+  </head>
+  <body>
+    <script>
+      (function () {
+        /**
+         * retrieve config
+         */
+        var config = {};
+
+        (this.location.search
+          .substr(1)
+          .match(/([^&]+)/g) || [])
+          .forEach(function (param) {
+            param = param.split('=');
+            config[param[0]] = unescape(param[1]) || '';
+          });
+
+        /**
+         * requirejs
+         */
+        var script = document.createElement('script');
+        script.addEventListener('load', function () {
+          require.customConfig = config;
+        });
+        script.setAttribute('src', config.baseUrl + '/lib/require-2.1.2.min.js');
+        script.setAttribute('data-main', config.baseUrl + '/videotag-widget/main.js');
+        document.head.appendChild(script);
+      }).call(window);
+    </script>
+  </body>
+</html>
