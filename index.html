@@ -10,11 +10,17 @@
         /**
          * retrieve config
          */
-        var config = {};
+        var config = {
+          'pageId': '{%page_id%}',
+          'baseUrl': '{%static_url%}',
+          'videotagApiUrl': '{%videotag_api_url%}',
+          'poserApiUrl': '{%poser_api_url%}',
+          'sockjsUrl': '{%sock_url%}',
+        };
 
-        (this.location.search
+        this.location.search
           .substr(1)
-          .match(/([^&]+)/g) || [])
+          .split('&')
           .forEach(function (param) {
             param = param.split('=');
             config[param[0]] = unescape(param[1]) || '';
@@ -25,7 +31,7 @@
          */
         var script = document.createElement('script');
         script.addEventListener('load', function () {
-          require.customConfig = config;
+          require.appConfig = config;
         });
         script.setAttribute('src', config.baseUrl + '/lib/require-2.1.2.min.js');
         script.setAttribute('data-main', config.baseUrl + '/videotag-widget/main.js');

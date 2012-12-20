@@ -23,23 +23,6 @@ body {
     font-size: 14px;
 }
 
-#main {
-  position: relative;
-
-  width: 1000px;
-  height: 480px;
-
-  margin: 32px auto;
-  padding: 8px;
-
-  border-radius: 2px;
-
-  box-shadow: 1px 1px 2px 0 $color_fg_2, 0 0 0 1px $color_fg_3;
-}
-
-#player {
-}
-
 #ticker {
   position: absolute;
   top: 0;
@@ -375,39 +358,41 @@ body {
       }
     }
   }
+}
 
-  > footer {
-    position: absolute;
-    right: 0;
-    bottom: 8px;
-    left: 8px;
+#main > .menu {
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+  left: 8px;
 
-    border-radius: 2px;
+  border-radius: 2px;
 
-    background-color: $color_bg_5;
+  background-color: $color_bg_5;
 
-    text-align: right;
+  text-align: right;
 
-    .button {
-      display: inline-block;
+  .button {
+    display: inline-block;
 
-      padding: 4px 8px;
+    padding: 4px 8px;
 
-      color: $color_fg_5;
+    color: $color_fg_5;
 
-      cursor: pointer;
+    cursor: pointer;
 
-      &.hidden {
-        display: none;
-      }
+    &.hidden {
+      display: none;
+    }
 
-      &.back,
-      &.back-2 {
-        float: left;
-      }
+    &.back,
+    &.back-2 {
+      float: left;
     }
   }
 }
+
+
 
 #options-menu {
   position: absolute;
