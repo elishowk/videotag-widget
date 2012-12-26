@@ -1,3 +1,5 @@
+{% load static %}
+{% load url from future %}
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -11,12 +13,15 @@
          * retrieve config
          */
         var config = {
-          'pageId': '{%page_id%}',
-          'baseUrl': '{%static_url%}',
-          'videotagApiUrl': '{%videotag_api_url%}',
-          'poserApiUrl': '{%poser_api_url%}',
-          'sockjsUrl': '{%sock_url%}',
+          'baseUrl': '{% get_static_prefix %}',
+          'videotagApiUrl': '{{ videotagApiUrl }}',
+          'poserApiUrl': '{{ poserApiUrl }}',
+          'sockjsUrl': '{{ sockjsUrl }}',
+          'pageId': '{{ current_page.id }}',
+          'hasChangePermissions': '{{ hasChangePermissions }}',
+          'hasViewPermissions': '{{ hasViewPermissions }}',
         };
+
 
         this.location.search
           .substr(1)
@@ -33,8 +38,8 @@
         script.addEventListener('load', function () {
           require.appConfig = config;
         });
-        script.setAttribute('src', config.baseUrl + '/lib/require-2.1.2.min.js');
-        script.setAttribute('data-main', config.baseUrl + '/videotag-widget/main.js');
+        script.setAttribute('src', config.baseUrl + 'lib/require-2.1.2.min.js');
+        script.setAttribute('data-main', config.baseUrl + 'videotag-widget/main.js');
         document.head.appendChild(script);
       }).call(window);
     </script>
