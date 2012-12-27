@@ -1,19 +1,19 @@
 /*global define, _*/
 
 define([
-  'backbone',
-  'modules/ticker/views/main.js'
+    'backbone',
+    'modules/ticker/views/main'
 ], function (Backbone, TickerViewsMain) {
-  'use strict';
+    'use strict';
 
-  var Ticker = function () {};
+    var Ticker = function () {};
 
-  _.extend(Ticker.prototype, Backbone.Events, {
-    'initialize': function () {
-      this.trigger('ready');
-    },
-    'view': new TickerViewsMain()
-  });
+    _.extend(Ticker.prototype, Backbone.Events, {
+        'initialize': function () {
+            this.trigger('ready');
+        },
+        'view': new TickerViewsMain()
+    });
 
-  return Ticker;
+    return Ticker;
 });
