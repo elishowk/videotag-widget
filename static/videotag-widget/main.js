@@ -33,16 +33,6 @@ define([
 ], function (App) {
   'use strict';
 
-  $.ajax({
-    'url': require.appConfig.videotagApiUrl.replace(/videotag_api\/?$/, ''),
-    'success': function (config) {
-      _.forEach(config, function (value, key) {
-        key = key[0].toUpperCase() + $.camelCase(key.replace(/_/g, '-')).substr(1);
-        require.appConfig['videotag' + key] = value;
-      });
-    }
-  });
-
   App.on('ready', function () {
     $(document.body).append(App.view.$el);
   });
