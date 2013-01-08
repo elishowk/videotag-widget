@@ -1,12 +1,12 @@
 /*global define*/
 
-// TODO https://github.com/CommOnEcoute/videotag-widget/issues/4
 define(['modules/player/adapters/youtube'], function (player) {
-  'use strict';
+    'use strict';
 
-  return {
-    'getPlayer': function () {
-      return player;
-    }
-  };
+    return {
+        'getPlayer': function () {
+            // TODO take option here and build player
+            return player;
+        }
+    };
 });

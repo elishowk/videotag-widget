@@ -1,47 +1,65 @@
 /*global define, _*/
 
 define([
-  'modules/player/abstract',
-  'modules/player/views/main',
-  'noext!http://youtube.com/iframe_api'
+    'modules/player/adapters/abstract',
+    'modules/player/views/main',
+    'noext!http://youtube.com/iframe_api'
 ], function (PlayerAbstract, PlayerViewsMain) {
-  'use strict';
+    'use strict';
 
-  var player = function () {};
-  var YT = window.YT;
+    var player = function () {};
 
-  _.extend(player.prototype, PlayerAbstract, {
-    'build': function () {
-      // Need to append to document for YT API to load
-      var el = $('<div>')
-        .attr('id', _.uniqueId('player_'))
-        .appendTo(document.body)
+    _.extend(player.prototype, PlayerAbstract, {
+        'options': {
+            'width': 640,
+            'height': 390
+        },
+        'build': function (videoId, options) {
+            // Need to append to document for YT API to load
+            this.options = _.defaults(options || {}, this.options);
+            this.view = new PlayerViewsMain({
+                'type': 'youtube'
+            });
+            this.view.$el.appendTo(document.body);
 
-      this.view = new PlayerViewsMain(el, 'youtube');
+            window.onYouTubeIframeAPIReady = function () {
+                this.player = new window.YT.Player(this.view.el, {
+                    'width': this.options.width,
+                    'height': this.options.height,
+                    'videoId': videoId,
+                    'events': {
+                        'onReady': _.once(function (data) {
+                            this.view.setElement(data.target.getIframe()).render();
+                            this.trigger('ready');
+                        }.bind(this)),
+                        'onStateChange': function () {
+                            this.emitCurrentReference();
+                        }.bind(this)
+                    }
+                });
+            }.bind(this);
+        },
+        'play': function () {
+            this.player.playVideo();
 
-      window.onYouTubeIframeAPIReady = function () {
-        // TODO get from conf
-        this.player = new YT.Player(el[0], {
-          'height': 390,
-          'width': 640,
-          'origin': 'http://localhost:9000',
-          'videoId': 'K--8I5TzEOo',
-          'events': {
-            'onReady': function () {
-              // TODO DETACH FROM DOM
-              this.trigger('ready');
-            }.bind(this),
-          }
-        });
-      }.bind(this);
-    },
-    'play': function () {
-      this.player.playVideo();
-    },
-    'pause': function () {
-      this.player.pauseVideo();
-    }
-  });
+            return this;
+        },
+        'pause': function () {
+            this.player.pauseVideo();
 
-  return player;
+            return this;
+        },
+        'seek': function (reference) {
+            this.player.seekTo(reference);
+
+            return this;
+        },
+        'getCurrentReference': function () {
+            // TODO remove post-debug
+            this.player.setVolume(0);
+            return this.player.getCurrentTime();
+        }
+    });
+
+    return player;
 });

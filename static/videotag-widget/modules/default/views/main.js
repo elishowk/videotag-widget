@@ -1,24 +1,38 @@
 /*global define*/
 
-define(['backbone'], function (Backbone) {
-  'use strict';
+define([
+    'backbone',
+], function (Backbone) {
+    'use strict';
 
-  return new (Backbone.View.extend({
-    'id': 'main',
-    'tagName': 'div',
-    'render': function (content, empty) {
-      if (content instanceof Backbone.View) {
-        content = content.$el;
-      }
+    return new (Backbone.View.extend({
+        'id': 'main',
+        'tagName': 'div',
+        'initialize': function () {
+            this.$el.append(
+                $('<div>').addClass('header'),
+                $('<div>').addClass('left'),
+                $('<div>').addClass('right')
+            );
+        },
+        'render': function (content, target, empty) {
+            if (content instanceof Backbone.View) {
+                content = content.$el;
+            }
 
-      if (empty) {
-        this.$el.empty();
-      }
+            if (target) {
+                target = this.$el.children('.' + target);
+            } else {
+                target = this.$el;
+            }
 
-      this.$el
-        .append(content);
+            if (empty) {
+                target.empty();
+            }
 
-      return this;
-    },
-  }))();
+            target.append(content);
+
+            return this;
+        },
+    }))();
 });

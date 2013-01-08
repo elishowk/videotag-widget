@@ -1,60 +1,129 @@
 /*global define, _*/
 
 define([
-  'backbone',
-  'mediator/main',
-  'modules/ticker/main',
-  'modules/player/main',
-  'modules/default/views/main',
-  'modules/default/views/menu',
+    'backbone',
+    'mediator/main'
 ], function (
-  Backbone,
-  Mediator,
-  Ticker,
-  PlayerFactory,
-  DefaultViewsMain,
-  DefaultViewsMenu
+    Backbone,
+    Mediator
 ) {
-  'use strict';
+    'use strict';
+// TODO XSS!
+    var App = _.extend({
+        'currentReference': 0,
+        'initialize': function () {
+            require([
+                'modules/ticker/main',
+                'modules/player/main',
+                'modules/session/main',
+                'modules/default/views/main',
+                'modules/default/views/main-menu',
+                'modules/feeds/models/message',
+                'modules/feeds/collections/message',
+                //'modules/feeds/main'
+            ], function (
+                Ticker,
+                PlayerFactory,
+                SessionMain,
+                DefaultViewsMain,
+                DefaultViewsMainMenu,
+                FeedsModelsMessage,
+                FeedsCollectionsMessage
+            ) {
+                var modules = {
+                    'mediator': new Mediator(),
+                    'session': SessionMain.get(),
+                    'view': DefaultViewsMain,
+                    'ticker': new Ticker(),
+                    'player': new (PlayerFactory.getPlayer())(),
+                    'menu': new DefaultViewsMainMenu({'back': true}),
+                    'feeds': {},
+                };
+                var modulesToLoad = 2;
 
-  return _.extend({
-    'initialize': function () {
-      var modules = {
-        'mediator': new Mediator(),
-        'view': DefaultViewsMain,
-        'ticker': new Ticker(),
-        'player': new (PlayerFactory.getPlayer())(),
-        'menu': new DefaultViewsMenu()
-      };
-      var modulesToLoad = 2;
+                _.extend(this, modules);
 
-      _.extend(this, modules);
+                this.on('moduleLoaded', function () {
+                    modulesToLoad -= 1;
 
-      this.on('moduleLoaded', function () {
-        modulesToLoad -= 1;
+                    if (modulesToLoad === 0) {
+                        this.off('moduleLoaded');
+                        this.trigger('ready');
+                    }
+                }, this);
 
-        if (modulesToLoad === 0) {
-          this.trigger('ready');
-          window.player = this.player
-        }
-      }, this);
+                /* TODO plug back when Elias is done with it
+                 * and move everything into feeds/main.js
+                this.feeds.once('ready', function () {
+                    this.trigger('moduleLoaded');
+                }, this);
+                this.feeds.initialize();
+                */
 
-      this.player.on('ready', function (playerView) {
-        this.view.render(this.player.view.render());
-        this.trigger('moduleLoaded');
-      }, this);
-      this.player.initialize();
+                this.feeds.messages = new FeedsCollectionsMessage();
+                this.feeds.messages.on('add', function (model) {
+                    var messageId = model.get('metadata').replyTo;
 
-      this.ticker.on('ready', function (tickerView) {
-        this.view.render(this.ticker.view.render());
-        this.trigger('moduleLoaded');
-      }, this);
-      this.ticker.initialize();
+                    if (messageId) {
+                        App.mediator.emit('feeds::message::reply::' + messageId, model, messageId);
+                    } else {
+                        App.mediator.emit('feeds::message::user::' + model.get('created_by'), model, model.get('created_by'));
+                    }
+                });
+                App.mediator.on('feeds::message::new', function (data) {
+                    /**
+                     * TODO
+                     * remove fake ID and fake user (window.user)
+                     * new FeedsModelsMessage
+                     * save
+                     * within the callback add the model in App.feeds.messages
+                     */
+                    var attrs = {
+                        'reference': data.reference,
+                        'username': window.username || 'avetisk',
+                        'created_by': window.userId || 123,
+                        'created_at': ~~((new Date()).getTime() / 1000),
+                        'id': _.uniqueId(),
+                        'metadata': {
+                            'body': data.body,
+                            'like': 0
+                        }
+                    };
 
-      return this;
-    },
-    'configure': function () {
-      // $.ajaxSetup() set CSRF (and API key)
-    }
-  }, Backbone.Events);
+                    if (data.replyTo) {
+                        attrs.metadata.replyTo = data.replyTo;
+                    }
+
+                    var feedsMessageModel = new FeedsModelsMessage(attrs);
+
+                    this.feeds.messages.add(feedsMessageModel);
+                }, this);
+
+                this.player.once('ready', function () {
+                    this.view.render(this.player.view, 'left');
+                    this.trigger('moduleLoaded');
+                }, this);
+                App.mediator.on('player::currentReference', function (reference) {
+                    this.currentReference = reference;
+                }, this);
+                // TODO created_by conf
+                this.player.initialize('K--8I5TzEOo');
+
+                this.ticker.once('ready', function () {
+                    this.view.render(this.ticker.view, 'right');
+                    this.trigger('moduleLoaded');
+                }, this);
+                this.ticker.initialize();
+
+                this.view.render(this.menu.render(), 'right');
+
+                return this;
+            }.bind(this));
+        },
+    }, Backbone.Events);
+
+    // TODO remove global
+    window.App = App;
+
+    return App;
 });
