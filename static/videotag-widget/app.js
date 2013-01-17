@@ -15,31 +15,33 @@ define([
             require([
                 'modules/ticker/main',
                 'modules/player/main',
-                'modules/session/main',
                 'modules/default/views/main',
                 'modules/default/views/main-menu',
                 'modules/feeds/models/message',
                 'modules/feeds/collections/message',
-                //'modules/feeds/main'
+                'modules/feeds/main',
+                'modules/session/model'
             ], function (
                 Ticker,
                 PlayerFactory,
-                SessionMain,
                 DefaultViewsMain,
                 DefaultViewsMainMenu,
                 FeedsModelsMessage,
-                FeedsCollectionsMessage
+                FeedsCollectionsMessage,
+                Feeds,
+                SessionModel
             ) {
                 var modules = {
                     'mediator': new Mediator(),
-                    'session': SessionMain.get(),
+                    // TODO retrieve real id /poser/api/user/
+                    'session': new SessionModel({'id': 1}),
                     'view': DefaultViewsMain,
                     'ticker': new Ticker(),
                     'player': new (PlayerFactory.getPlayer())(),
                     'menu': new DefaultViewsMainMenu({'back': true}),
-                    'feeds': {},
+                    'feeds': new Feeds,
                 };
-                var modulesToLoad = 2;
+                var modulesToLoad = 3;
 
                 _.extend(this, modules);
 
@@ -52,13 +54,17 @@ define([
                     }
                 }, this);
 
-                /* TODO plug back when Elias is done with it
-                 * and move everything into feeds/main.js
+                this.session.on('ready', function () {
+                    this.trigger('moduleLoaded');
+                });
+                this.session.fetch({'success': function () {
+                    this.trigger('moduleLoaded');
+                }.bind(this)});
+
                 this.feeds.once('ready', function () {
                     this.trigger('moduleLoaded');
                 }, this);
                 this.feeds.initialize();
-                */
 
                 this.feeds.messages = new FeedsCollectionsMessage();
                 this.feeds.messages.on('add', function (model) {

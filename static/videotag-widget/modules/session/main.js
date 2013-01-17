@@ -1,9 +1,12 @@
 /*global define, _*/
 
 define([
-    'backbone',
     'modules/session/model'
-], function (Backbone, SessionModel) {
+], function (
+    SessionModel,
+    SessionViewsSignIn,
+    SessionViewsSignUp
+) {
     'use strict';
 
     return {
@@ -19,16 +22,30 @@ define([
                     throw new Error('no session (id=`' + id + '`');
                 }
 
+                this.currentSession = session;
+
                 return session;
             }
 
-            session = new SessionModel({'id': _.uniqueId('session_')});
+            // TODO retrieve `whoami`
+            session = new SessionModel({'id': 1}, {'main': this});
 
             session.on('destroy', function (session) {
                 this.sessions[session.get('id')] = null;
             }, this);
 
+            this.currentSession = session;
+
             return session;
         },
+        'signup': function () {
+            App.mediator.emit('user::signin::success');
+        },
+        'signin': function () {
+            App.mediator.emit('user::signin::success');
+        },
+        'signout': function () {
+            App.mediator.emit('user::signout::success');
+        }
     };
 });

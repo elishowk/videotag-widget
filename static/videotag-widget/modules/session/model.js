@@ -1,14 +1,14 @@
 /*global define*/
 
-define(['backbone'], function (Backbone) {
+define(['videotag/user/model'], function (UserModel) {
     'use strict';
 
-    return Backbone.Model.extend({
+    return UserModel.extend({
         // TODO set true after plug of auth
+        'user': null,
         'valid': false,
+        'views': {},
         'initialize': function () {
-            // TODO get the real user data
-            this.set('userId', window.userId || 123);
             this.on('destroy', function () {
                 this.valid = false;
             }, this);
@@ -17,61 +17,58 @@ define(['backbone'], function (Backbone) {
             return this.valid;
         },
         'signup': function () {
-            window.open(
-                '/account/signup/?next=/account/login?next=/callback.html?param=user::signup::success',
-                'window_signup',
-                'width=640,height=480,left=' + ((window.screen.availWidth - 640) / 2) + ',top=' + ((window.screen.availHeight - 480) / 2)
-            );
-            var onMessage = function (e) {
-                if (e.origin !== window.location.origin) {
-                    return;
-                }
-                window.removeEventListener('message', onMessage);
-
-                this.valid = false;
-
-                App.mediator.emit('user::signin::success');
-            }.bind(this);
-
-            window.addEventListener('message', onMessage, true);
+            App.mediator.emit('user::signin::success');
         },
         'signin': function () {
-            window.open(
-                '/account/login/?next=/callback.html?param=user::signin::success',
-                'window_signin',
-                'width=640,height=480,left=' + ((window.screen.availWidth - 640) / 2) + ',top=' + ((window.screen.availHeight - 480) / 2)
-            );
-            var onMessage = function (e) {
-                if (e.origin !== window.location.origin) {
-                    return;
-                }
-                window.removeEventListener('message', onMessage);
+            if (this.views.signin) {
+                return App.view.render(this.views.signin.render().show());
+            }
 
-                this.valid = true;
+            // TODO move out
+            var getCookieObject = function () {
+                var arr = [];
 
-                App.mediator.emit('user::signin::success');
-            }.bind(this);
+                document.cookie.split(';').forEach(function (str) {
+                    arr.push(str.trim().split('='));
+                });
 
-            window.addEventListener('message', onMessage, true);
+                return _.object(arr);
+            }
+
+            require(['modules/session/views/signin'], function (SessionViewsSignin) {
+                var view = new SessionViewsSignin();
+                view.on('submit', function (data) {
+                    $.ajax({
+                        'url': '/account/login/',
+                        'type': 'POST',
+                        'headers': {
+                            'X-CSRFToken': getCookieObject().csrftoken
+                        },
+                        'data': data,
+                        'success': function (data) {
+                            data = $(data);
+
+                            if (data.find('form[action*="account/login"]').length === 0) {
+                                // TODO fetch self => /poser/api/user/
+                                this.valid = true;
+
+                                view.hide();
+
+                                App.mediator.emit('user::signin::success');
+                            } else {
+                                view.fail();
+                            }
+                        }.bind(this)
+                    });
+                });
+
+                App.view.render(view.render().show());
+
+                this.views.signin = view;
+            }.bind(this));
         },
         'signout': function () {
-            window.open(
-                '/account/logout/?next=/callback.html?param=user::signout::success',
-                'window_signout',
-                'width=640,height=480,left=' + ((window.screen.availWidth - 640) / 2) + ',top=' + ((window.screen.availHeight - 480) / 2)
-            );
-            var onMessage = function (e) {
-                if (e.origin !== window.location.origin) {
-                    return;
-                }
-                window.removeEventListener('message', onMessage);
-
-                this.valid = false;
-
-                App.mediator.emit('user::signout::success');
-            }.bind(this);
-
-            window.addEventListener('message', onMessage, true);
+            App.mediator.emit('user::signout::success');
         }
     });
 });

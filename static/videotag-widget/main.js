@@ -7,16 +7,14 @@ require.config({
         'i18n':         'lib/require-i18n-2.0.1.min',
         'noext':        'lib/require-noext-0.3.1.min',
         'backbone':     'lib/backbone-0.9.9.min',
-        'jquery':       'lib/jquery-1.8.3.min',
-        'underscore':   'lib/lodash-1.0.0.min',
         'app':          'videotag-widget/app',
         'modules':      'videotag-widget/modules',
     },
     'shim': {
         'backbone': {
             'deps': [
-                'underscore',
-                'jquery'
+                'lib/lodash-1.0.0.min',
+                'lib/jquery-1.8.3.min',
             ],
             'exports': 'Backbone'
         },
@@ -34,6 +32,7 @@ define([
 
     App.on('ready', function () {
         $(document.body).append(App.view.$el);
+        console.log('APP READY');
     });
     App.initialize();
 });

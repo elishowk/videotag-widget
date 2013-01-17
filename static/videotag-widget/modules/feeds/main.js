@@ -1,7 +1,7 @@
 /*global define, _*/
 
 define([
-    'Backbone',
+    'backbone',
     'feeds/feeds'
 ], function (Backbone, feeds) {
     'use strict';
@@ -12,6 +12,13 @@ define([
     _.extend(Feeds.prototype, Backbone.Events, {
         'feeds': {},
         'initialize': function () {
+            /**
+             * TODO
+             *
+             * retrieve all
+             * fill sort by type (create a collection by 'action')
+             * emit 'ready'
+             */
             var countFeedReady = 1;
             var onFeedReady = function () {
                 countFeedReady -= 1;
@@ -22,16 +29,13 @@ define([
             }.bind(this);
 
             poserFeeds.initialize(function () {
-                this.feeds.user = poserFeeds.feed('user');
-                this.feeds.user.on('feed.join', onFeedReady);
-                this.feeds.user.join();
-
-                this.feeds.message = poserFeeds.feed('message');
-                this.feeds.message.on('feed.join', onFeedReady);
+                // TODO get feed id from conf
+                this.feeds.message = poserFeeds.feed('widget');
+                this.feeds.message.on('join', onFeedReady);
                 this.feeds.message.join();
             }.bind(this));
         }
     });
 
-    return (new Feeds());
+    return Feeds;
 });
