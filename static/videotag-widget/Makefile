@@ -1,6 +1,6 @@
 TEMPLATES = $$(find . -name "*.tpl")
 CONVERTED_TEMPLATES = $(subst .tpl,.tpl.js,$(TEMPLATES))
-JS = $$(find app.js config.js modules -name "*.js")
+JS = $$(find app.js main.js modules -name "*.js" | grep -v '\.tpl\.js')
 
 build: clean install templates css
 	@#mkdir build
@@ -23,6 +23,9 @@ clean:
 css: css/*.styl
 	@echo "\033[01;32m[INFO]\033[0m"' compiling .styl into .css'
 	@./node_modules/stylus/bin/stylus ./css
+
+jshint: $(wildcard JS)
+	@jshint --config .jshintrc $(JS)
 
 templates: $(wildcard TEMPLATES)
 	@echo "\033[01;32m[INFO]\033[0m"' converting .tpl into .tpl.js:'

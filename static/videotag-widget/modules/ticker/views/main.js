@@ -18,18 +18,12 @@ define([
         'referenceTag': null,
         'currentReference': false,
         'events': {
-            'click > .no-session .sign-in': function () {
-                App.session.signin();
-            },
-            'click > .no-session .sign-up': function () {
-                App.session.signup();
-            },
             'click > .ticker > .message > .context-menu > .item.twitter': function (e) {
                 // TODO move social features out
-                var url = 'https://twitter.com/intent/tweet/?text='
-                    + $(e.target).parents('.message').find('.body > .content').text()
-                    + ' ' + window.location.href
-                    + ' @commonecoute';
+                var url = 'https://twitter.com/intent/tweet/?text=' +
+                    $(e.target).parents('.message').find('.body > .content').text() +
+                    ' ' + window.location.href +
+                    ' @commonecoute';
                 window.open(url);
 
                 return false;
@@ -45,11 +39,12 @@ define([
             'click > .ticker > .message > .body > .reference': function (e) {
                 this.trigger('message::seek', parseInt($(e.currentTarget).attr('data-reference'), 10));
             },
-            'focus textarea': function () {
+            'focus textarea': function (e) {
                 if (! App.session.isValid()) {
-                    this.showLogin();
+                    App.session.signin();
+                    e.target.blur();
 
-                    return true;
+                    return false;
                 }
 
                 this.$el.addClass('on');
@@ -85,8 +80,6 @@ define([
         'initialize': function () {
             this.$el.html(_.template(tpl, {'currentLength': this.maxCharAllowed}));
             this.referenceTag = this.$el.find('> .form > .reference');
-
-            App.mediator.on('user::signin::success', this.hideLogin, this);
         },
         'updateCounter': function (count) {
             var counter = this.$el.find('> .form > .counter');
@@ -128,16 +121,6 @@ define([
                 ticker.hideRight();
             }
             ticker.$el.appendTo(this.$el);
-        },
-        'showLogin': function () {
-            // TODO move out sign-in/up process
-            this.$el.find('> .form > textarea').blur();
-            this.$el.children('.no-session').addClass('on');
-        },
-        'hideLogin': function () {
-            // TODO move out sign-in/up process
-            this.$el.find('> .form > textarea').focus();
-            this.$el.children('.no-session').removeClass('on');
         },
         'render': function () {
             return this;

@@ -20,7 +20,7 @@ define([
                 'modules/feeds/models/message',
                 'modules/feeds/collections/message',
                 'modules/feeds/main',
-                'modules/session/model'
+                'modules/session/main'
             ], function (
                 Ticker,
                 PlayerFactory,
@@ -29,24 +29,25 @@ define([
                 FeedsModelsMessage,
                 FeedsCollectionsMessage,
                 Feeds,
-                SessionModel
+                SessionMain
             ) {
                 var modules = {
                     'mediator': new Mediator(),
-                    // TODO retrieve real id /poser/api/user/
-                    'session': new SessionModel({'id': 1}),
+                    'session': new SessionMain(),
                     'view': DefaultViewsMain,
                     'ticker': new Ticker(),
                     'player': new (PlayerFactory.getPlayer())(),
                     'menu': new DefaultViewsMainMenu({'back': true}),
-                    'feeds': new Feeds,
+                    'feeds': new Feeds(),
                 };
-                var modulesToLoad = 3;
+                var modulesToLoad = 4;
 
                 _.extend(this, modules);
 
-                this.on('moduleLoaded', function () {
+                this.on('moduleLoaded', function (moduleName) {
                     modulesToLoad -= 1;
+
+                    console.log('MODULE `' + moduleName + '` LOADED');
 
                     if (modulesToLoad === 0) {
                         this.off('moduleLoaded');
@@ -55,14 +56,12 @@ define([
                 }, this);
 
                 this.session.on('ready', function () {
-                    this.trigger('moduleLoaded');
-                });
-                this.session.fetch({'success': function () {
-                    this.trigger('moduleLoaded');
-                }.bind(this)});
+                    this.trigger('moduleLoaded', 'session');
+                }, this);
+                this.session.initialize();
 
                 this.feeds.once('ready', function () {
-                    this.trigger('moduleLoaded');
+                    this.trigger('moduleLoaded', 'feeds');
                 }, this);
                 this.feeds.initialize();
 
@@ -107,7 +106,7 @@ define([
 
                 this.player.once('ready', function () {
                     this.view.render(this.player.view, 'left');
-                    this.trigger('moduleLoaded');
+                    this.trigger('moduleLoaded', 'player');
                 }, this);
                 App.mediator.on('player::currentReference', function (reference) {
                     this.currentReference = reference;
@@ -117,7 +116,7 @@ define([
 
                 this.ticker.once('ready', function () {
                     this.view.render(this.ticker.view, 'right');
-                    this.trigger('moduleLoaded');
+                    this.trigger('moduleLoaded', 'ticker');
                 }, this);
                 this.ticker.initialize();
 
@@ -125,6 +124,15 @@ define([
 
                 return this;
             }.bind(this));
+        },
+        'getCookieObject': function () {
+            var arr = [];
+
+            document.cookie.split(';').forEach(function (str) {
+                arr.push(str.trim().split('='));
+            });
+
+            return _.object(arr);
         },
     }, Backbone.Events);
 

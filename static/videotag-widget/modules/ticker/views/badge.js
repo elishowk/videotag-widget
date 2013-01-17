@@ -79,7 +79,7 @@ define([
             this.model.on('change:like', this.onLike, this);
 
             window.setImmediate(function () {
-                if (App.session.isValid() && this.model.get('created_by') === App.session.get('userId')) {
+                if (App.session.isValid() && this.model.get('created_by') === App.session.user.get('id')) {
                     this.$el.addClass('my');
                 }
 

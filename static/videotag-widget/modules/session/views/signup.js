@@ -4,18 +4,18 @@ define([
     'backbone',
     'modules/session/templates/signup.tpl'
 ], function (Backbone, tpl) {
+    'use strict';
+
     return Backbone.View.extend({
         'tagName': 'div',
         'className': 'popin session signin',
         'events': {
-            'click .submit': function (e) {
-                e.preventDefault();
-
+            'click .submit': function () {
                 this.trigger('submit', {
                     'email': this.$el.find('input.email').val(),
-                    'username': this.$el.find('input.username'.val(),
-                    'password': this.$el.find('input.password'.val(),
-                    'password_confirm': this.$el.find('input.password'.val()
+                    'username': this.$el.find('input.username').val(),
+                    'password': this.$el.find('input.password').val(),
+                    'password_confirm': this.$el.find('input.password').val()
                 });
 
                 return false;

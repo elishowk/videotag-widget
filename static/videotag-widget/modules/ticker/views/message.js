@@ -34,7 +34,7 @@ define([
             this.build();
         },
         'build': function () {
-            if (App.session.isValid() && this.model.get('created_by') === App.session.get('userId')) {
+            if (App.session.isValid() && this.model.get('created_by') === App.session.user.get('id')) {
                 this.$el.addClass('my');
             }
 
@@ -52,7 +52,7 @@ define([
         },
         'buildMenu': function () {
             this.menu = new DefaultViewsMenu();
-            this.menu.add('delete')
+            this.menu.add('delete');
             this.menu.add('twitter');
             this.menu.add('like', {
                 'className': this.model.isLikedByUser() ? 'on' : '',

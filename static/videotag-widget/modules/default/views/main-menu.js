@@ -1,8 +1,9 @@
 /*global define*/
 
 define([
+    'app',
     'modules/default/views/menu',
-], function (DefaultViewsMenu) {
+], function (App, DefaultViewsMenu) {
     'use strict';
 
     return DefaultViewsMenu.extend({

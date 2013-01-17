@@ -1,4 +1,4 @@
-/*global define, _*/
+/*global define*/
 
 require.config({
     'baseUrl': require.appConfig.baseUrl,
@@ -27,6 +27,7 @@ require.config({
 define([
     'app',
     'poser/backbone-tastypie-0.1',
+    'lib/setimmediate-1.0.1.min'
 ], function (App) {
     'use strict';
 
