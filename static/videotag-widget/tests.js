@@ -1,19 +1,19 @@
 /**
  * Tests.
  */
-require([window.feedsTestsConfig.baseUrl + 'videotag/tools/sort.js',
-        window.feedsTestsConfig.baseUrl + 'lib/chai-1.4.0.js'],
-    function(sort, chai) {
+require([
+        window.testConfig.baseUrl + 'videotag/tools/sort.js',
+        window.testConfig.baseUrl + 'feeds/mockdata.js',
+        window.testConfig.baseUrl + 'lib/chai-1.4.0.js',
+        window.testConfig.baseUrl + 'lib/lodash-1.0.0.min.js'
+],
+    function(sort, mockdata, chai) {
 
     describe('testing sort.js', function() {
         it('simple test', function() {
-            expect(Feeds).to.be.a('function');
-            var feeds = Feeds(sockjsurl);
-            expect(feeds).to.be.a('object');
-            expect(feeds).to.have.property('sock');
-            expect(feeds).to.have.property('feed');
-            expect(feeds).to.have.property('trigger');
-            expect(feeds).to.have.property('send');
+            var users = sort.sort(_.values(mockdata.mockfeed));
+            console.log(users);
+            expect(users).to.be.a('array');
         });
     });
 
