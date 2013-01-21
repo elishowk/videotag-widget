@@ -24,7 +24,7 @@ define([
         'build': function () {
             this.collection = new FeedsCollectionsMessage(null, {
                 'comparator': function (model) {
-                    return -model.get('reference');
+                    return -parseInt(model.get('reference'), 10);
                 }
             });
 
@@ -42,7 +42,7 @@ define([
         },
         'render': function (reference) {
             var models = this.collection.filter(function (model) {
-                return this.checkReferenceRange(model.get('reference'), reference);
+                return this.checkReferenceRange(parseInt(model.get('reference'), 10), reference);
             }, this);
 
             if (models.length === 0) {
@@ -51,8 +51,8 @@ define([
             }
 
             var model = _.reduce(models, function (modelA, modelB) {
-                var referenceA = modelA.get('reference');
-                var referenceB = modelB.get('reference');
+                var referenceA = parseInt(modelA.get('reference'), 10);
+                var referenceB = parseInt(modelB.get('reference'), 10);
 
                 if (referenceA === referenceB) {
                     if (modelA.get('created_at') > modelB.get('created_at')) {
@@ -79,21 +79,22 @@ define([
             this.model.on('change:like', this.onLike, this);
 
             window.setImmediate(function () {
+                // TODO should *NOT* be able to delete message after signout
                 if (App.session.isValid() && this.model.get('created_by') === App.session.user.get('id')) {
                     this.$el.addClass('my');
                 }
 
-                this.$el
-                    .html(_.template(tpl, {
-                        'model': this.model,
-                        'Format': Format
-                    }))
-                    .attr({
-                        'data-user-id': this.model.get('created_by'),
-                        'data-message-id': this.model.get('id')
-                    });
-                this.buildMenu();
-                this.show();
+                this.model.fetchUser(function (userModel) {
+                    this.$el
+                        .html(_.template(tpl, {
+                            'model': this.model,
+                            'user': userModel,
+                            'Format': Format
+                        }))
+                        .attr('data-user-id', this.model.get('created_by'));
+                    this.buildMenu();
+                    this.show();
+                }.bind(this));
             }.bind(this));
 
             return this;

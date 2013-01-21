@@ -21,7 +21,7 @@ define([
             'click > .ticker > .message > .context-menu > .item.twitter': function (e) {
                 // TODO move social features out
                 var url = 'https://twitter.com/intent/tweet/?text=' +
-                    $(e.target).parents('.message').find('.body > .content').text() +
+                    $(e.target).parents('.message').find('.text > .content').text() +
                     ' ' + window.location.href +
                     ' @commonecoute';
                 window.open(url);
@@ -31,12 +31,7 @@ define([
             'click > .ticker.global > .badge': function (e) {
                 this.trigger('ticker::user::show', e.currentTarget.getAttribute('data-user-id'));
             },
-            /* TODO plug back reply for next milestone (1.1)
-            'click > .ticker.user > .message': function (e) {
-                this.trigger('ticker::message::show', e.currentTarget.getAttribute('data-message-id'));
-            },
-            */
-            'click > .ticker > .message > .body > .reference': function (e) {
+            'click > .ticker > .message > .text > .reference': function (e) {
                 this.trigger('message::seek', parseInt($(e.currentTarget).attr('data-reference'), 10));
             },
             'focus textarea': function (e) {

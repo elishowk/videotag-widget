@@ -2,13 +2,16 @@
 
 define([
     'backbone',
-    'mediator/main'
+    'mediator/main',
 ], function (
     Backbone,
     Mediator
 ) {
     'use strict';
-// TODO XSS!
+
+    // TODO get from conf
+    require.appConfig.feedId = 'widget-1';
+
     var App = _.extend({
         'currentReference': 0,
         'initialize': function () {
@@ -17,39 +20,51 @@ define([
                 'modules/player/main',
                 'modules/default/views/main',
                 'modules/default/views/main-menu',
-                'modules/feeds/models/message',
-                'modules/feeds/collections/message',
                 'modules/feeds/main',
-                'modules/session/main'
+                'modules/session/main',
+                'modules/data/map'
             ], function (
                 Ticker,
                 PlayerFactory,
                 DefaultViewsMain,
                 DefaultViewsMainMenu,
-                FeedsModelsMessage,
-                FeedsCollectionsMessage,
                 Feeds,
-                SessionMain
+                SessionMain,
+                DataMap
             ) {
-                var modules = {
-                    'mediator': new Mediator(),
-                    'session': new SessionMain(),
-                    'view': DefaultViewsMain,
-                    'ticker': new Ticker(),
-                    'player': new (PlayerFactory.getPlayer())(),
-                    'menu': new DefaultViewsMainMenu({'back': true}),
-                    'feeds': new Feeds(),
-                };
-                var modulesToLoad = 4;
+                var loaded = 0;
 
-                _.extend(this, modules);
+                /**
+                 * Mediator
+                 */
+                this.mediator = new Mediator();
+
+                /**
+                 * Global views
+                 */
+                this.view = DefaultViewsMain;
+                this.menu = new DefaultViewsMainMenu({'back': true});
+
+                /**
+                 * Data Mapping
+                 */
+                this.dataMap = new DataMap();
+                this.dataMap.initialize();
+
+                /**
+                 * Modules
+                 */
+                this.session = new SessionMain();
+                this.ticker = new Ticker();
+                this.player = new (PlayerFactory.getPlayer())();
+                this.feeds = new Feeds();
 
                 this.on('moduleLoaded', function (moduleName) {
-                    modulesToLoad -= 1;
+                    loaded += 1;
 
                     console.log('MODULE `' + moduleName + '` LOADED');
 
-                    if (modulesToLoad === 0) {
+                    if (loaded === 4) {
                         this.off('moduleLoaded');
                         this.trigger('ready');
                     }
@@ -62,46 +77,6 @@ define([
 
                 this.feeds.once('ready', function () {
                     this.trigger('moduleLoaded', 'feeds');
-                }, this);
-                this.feeds.initialize();
-
-                this.feeds.messages = new FeedsCollectionsMessage();
-                this.feeds.messages.on('add', function (model) {
-                    var messageId = model.get('metadata').replyTo;
-
-                    if (messageId) {
-                        App.mediator.emit('feeds::message::reply::' + messageId, model, messageId);
-                    } else {
-                        App.mediator.emit('feeds::message::user::' + model.get('created_by'), model, model.get('created_by'));
-                    }
-                });
-                App.mediator.on('feeds::message::new', function (data) {
-                    /**
-                     * TODO
-                     * remove fake ID and fake user (window.user)
-                     * new FeedsModelsMessage
-                     * save
-                     * within the callback add the model in App.feeds.messages
-                     */
-                    var attrs = {
-                        'reference': data.reference,
-                        'username': window.username || 'avetisk',
-                        'created_by': window.userId || 123,
-                        'created_at': ~~((new Date()).getTime() / 1000),
-                        'id': _.uniqueId(),
-                        'metadata': {
-                            'body': data.body,
-                            'like': 0
-                        }
-                    };
-
-                    if (data.replyTo) {
-                        attrs.metadata.replyTo = data.replyTo;
-                    }
-
-                    var feedsMessageModel = new FeedsModelsMessage(attrs);
-
-                    this.feeds.messages.add(feedsMessageModel);
                 }, this);
 
                 this.player.once('ready', function () {
@@ -116,6 +91,9 @@ define([
 
                 this.ticker.once('ready', function () {
                     this.view.render(this.ticker.view, 'right');
+
+                    this.feeds.initialize();
+
                     this.trigger('moduleLoaded', 'ticker');
                 }, this);
                 this.ticker.initialize();

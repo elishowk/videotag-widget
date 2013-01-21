@@ -4,9 +4,9 @@ define(['modules/feeds/models/abstract'], function (FeedsAbstractModel) {
     'use strict';
 
     return FeedsAbstractModel.extend({
-        // TODO get properly `liked by user` value in `initialize`
-        'liked': false,
+        // TODO TODO TODO
         'like': function (options) {
+            // TODO get real value
             if (this.liked) {
                 return this.unlike(options);
             }
@@ -30,6 +30,18 @@ define(['modules/feeds/models/abstract'], function (FeedsAbstractModel) {
         },
         'isLikedByUser': function () {
             return this.liked;
+        },
+        'fetchUser': function (callback) {
+            var userModel = App.dataMap.users.get(this.get('created_by'));
+
+            if (userModel instanceof App.dataMap.users.model) {
+                return callback(userModel);
+            }
+
+            userModel = new App.dataMap.users.model({'id': this.get('created_by')});
+            userModel.fetch({'success': function () {
+                callback(userModel);
+            }});
         }
     });
 });

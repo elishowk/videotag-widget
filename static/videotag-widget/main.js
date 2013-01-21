@@ -21,13 +21,17 @@ require.config({
         'youtube-player-api': {
             'exports': 'YT'
         },
+        'app': {
+            'deps': [
+                'poser/backbone-tastypie-0.1',
+                'lib/setimmediate-1.0.1.min'
+            ]
+        }
     }
 });
 
 define([
-    'app',
-    'poser/backbone-tastypie-0.1',
-    'lib/setimmediate-1.0.1.min'
+    'app'
 ], function (App) {
     'use strict';
 

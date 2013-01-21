@@ -23,6 +23,8 @@ define([
         'events': {
             'click > .context-menu > .item.delete': function () {
                 this.model.destroy();
+
+                return false;
             },
             'click > .context-menu > .item.like': function () {
                 this.model.like();
@@ -62,13 +64,17 @@ define([
             this.$el.append(this.menu.$el);
         },
         'render': function () {
-            this.$el.attr('id', 'message-' + this.model.get('id'));
-            this.$el.html(_.template(tpl, {
-                'model': this.model,
-                'Format': Format
-            }));
+            this.model.fetchUser(function (userModel) {
+                this.$el
+                    .attr('id', 'message-' + this.model.get('id'))
+                    .html(_.template(tpl, {
+                        'model': this.model,
+                        'user': userModel,
+                        'Format': Format
+                    }));
 
-            this.buildMenu();
+                this.buildMenu();
+            }.bind(this));
 
             return this;
         },

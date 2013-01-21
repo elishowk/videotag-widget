@@ -1,9 +1,14 @@
 /*global define, _*/
 
 define([
+    'app',
     'backbone',
-    'feeds/feeds'
-], function (Backbone, feeds) {
+    'feeds/feeds',
+], function (
+    App,
+    Backbone,
+    feeds
+) {
     'use strict';
 
     var Feeds = function () {};
@@ -12,30 +17,22 @@ define([
     _.extend(Feeds.prototype, Backbone.Events, {
         'feeds': {},
         'initialize': function () {
-            /**
-             * TODO
-             *
-             * retrieve all
-             * fill sort by type (create a collection by 'action')
-             * emit 'ready'
-             */
-            var countFeedReady = 1;
-            var onFeedReady = function () {
-                countFeedReady -= 1;
-
-                if (! countFeedReady) {
-                    this.trigger('ready');
-                }
-            }.bind(this);
-
             poserFeeds.initialize(function () {
-                // TODO get feed id from conf
-                this.feeds.message = poserFeeds.feed('widget');
-                this.feeds.message.on('join', onFeedReady);
-                this.feeds.message.join();
+                this.feeds.messages = poserFeeds.feed(require.appConfig.feedId);
+                this.feeds.messages.on('join', function () {
+                    App.dataMap.messages.fetch({
+                        'update': true,
+                        'success': function () {
+                            this.trigger('ready');
+                        }.bind(this)
+                    });
+                }.bind(this));
+                this.feeds.messages.on('message.self', function (data) {
+                    App.dataMap.messages.addById(data.id);
+                });
+                this.feeds.messages.join();
             }.bind(this));
-        }
+        },
     });
-
     return Feeds;
 });

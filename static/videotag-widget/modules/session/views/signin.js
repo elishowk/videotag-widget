@@ -2,19 +2,23 @@
 
 define([
     'backbone',
-    'modules/session/templates/signin.tpl'
+    'modules/session/templates/sign-in.tpl'
 ], function (Backbone, tpl) {
     'use strict';
 
     return Backbone.View.extend({
         'tagName': 'div',
-        'className': 'popin session signin',
+        'className': 'popin session sign-in',
         'events': {
             'click': function (e) {
                 if (e.target !== this.el) {
                     return;
                 }
 
+                this.hide();
+            },
+            'click .sign-up': function () {
+                this.trigger('sign-up')
                 this.hide();
             },
             'click .submit': function () {
@@ -42,8 +46,9 @@ define([
 
             return this;
         },
-        'fail': function () {
-            this.$el.find('p.error').addClass('on');
+        'fail': function (target) {
+            target = target ? '.' + target : '';
+            this.$el.find('p.error' + target).addClass('on');
 
             return this;
         },

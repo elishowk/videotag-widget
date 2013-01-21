@@ -33,15 +33,11 @@ define([
             this.view.on('message::seek', function (reference) {
                 App.mediator.emit('player::seek', reference);
             }, this);
-            this.view.on('message::new', function (body, reference) {
+            this.view.on('message::new', function (text, reference) {
                 var data = {
-                    'body': body,
+                    'text': text,
                     'reference': reference
                 };
-
-                if (this.currentTicker instanceof TickerViewsReply) {
-                    data.replyTo = this.currentTicker.model.get('id');
-                }
 
                 App.mediator.emit('feeds::message::new', data);
             }, this);
@@ -58,12 +54,6 @@ define([
                     tickers['hide'].hideRight();
                 }.bind(this));
             }, this);
-            /* TODO plug back reply for next milestone (1.1)
-            this.view.on('ticker::message::show', function (messageId) {
-                this.currentTicker.hideLeft();
-                this.currentTicker = this.getTicker('reply', messageId).show();
-            }, this);
-            */
             this.view.render();
             this.view.appendTicker(this.globalTicker, true);
 
@@ -74,11 +64,6 @@ define([
                 this.globalTicker.collection.add(model);
                 this.getTicker('user', userId).collection.add(model);
             }, this);
-            /* TODO plug back reply for next milestone (1.1)
-            App.mediator.on('feeds::message::reply', function (model, messageId) {
-                this.getTicker('reply', messageId).collection.add(model);
-            }, this);
-            */
 
             this.trigger('ready');
         },

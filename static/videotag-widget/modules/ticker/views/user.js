@@ -12,7 +12,7 @@ define([
     return TickerViewsAbstract.extend({
         'className': 'ticker user',
         'comparator': function (model) {
-            return -model.get('reference');
+            return -parseInt(model.get('reference'), 10);
         },
         'pushMessage': function (messageModel) {
             var messageId = messageModel.get('id');

@@ -31,4 +31,4 @@ templates: $(wildcard TEMPLATES)
 	@echo "\033[01;32m[INFO]\033[0m"' converting .tpl into .tpl.js:'
 	@for file in $(TEMPLATES); do echo converting $$file; (printf 'define(function () { return '"'"''; awk '{gsub("'\\\''", "'\\\\\\\''"); printf "%s%s", $$0, "\\n"}' < $$file; printf "';});") > $$file.js; done
 
-.PHONY: build clean install templates css
+.PHONY: build clean install templates css jshint
