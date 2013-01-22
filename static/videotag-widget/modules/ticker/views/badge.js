@@ -21,38 +21,25 @@ define([
         'model': null,
         'updateThrottle': 1000,
         'timeRange': 60 * 3,
-        'build': function () {
-            this.collection = new FeedsCollectionsMessage(null, {
-                'comparator': function (model) {
-                    return -parseInt(model.get('reference'), 10);
-                }
-            });
-
-            App.mediator.on('player::currentReference', _.throttle(function (reference) {
-                this.render(reference);
+        'initialize': function () {
+            App.mediator.on('player::reference::current', _.throttle(function () {
+                this.render();
             }, this.updateThrottle), this);
         },
-        'pushModel': function (model) {
-            this.collection.add(model);
-
-            return this;
-        },
-        'checkReferenceRange': function (messageReference, globalReference) {
-            return messageReference >= (globalReference - this.timeRange) && messageReference <= globalReference;
-        },
-        'render': function (reference) {
+        'render': function () {
             var models = this.collection.filter(function (model) {
-                return this.checkReferenceRange(parseInt(model.get('reference'), 10), reference);
+                var reference = model.get('reference');
+
+                return reference >= (App.currentReference - this.timeRange) && reference <= App.currentReference;
             }, this);
 
             if (models.length === 0) {
-                // TODO fix blink (when posting a new comment)
                 return this.hide();
             }
 
             var model = _.reduce(models, function (modelA, modelB) {
-                var referenceA = parseInt(modelA.get('reference'), 10);
-                var referenceB = parseInt(modelB.get('reference'), 10);
+                var referenceA = modelA.get('reference');
+                var referenceB = modelB.get('reference');
 
                 if (referenceA === referenceB) {
                     if (modelA.get('created_at') > modelB.get('created_at')) {

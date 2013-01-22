@@ -24,6 +24,9 @@ define([
             this.collection.on('add', function (messageModel) {
                 this.pushMessage(messageModel);
             }, this);
+            this.collection.on('remove', function (messageModel) {
+                this.removeMessage(messageModel);
+            }, this);
         },
         'hideRight': function () {
             this.$el.addClass('hideRight');

@@ -17,7 +17,7 @@ define([
         },
         'emitCurrentReference': function () {
             this.timer = window.setInterval(function () {
-                App.mediator.emit('player::currentReference', ~~this.getCurrentReference());
+                App.mediator.emit('player::reference::current', ~~this.getCurrentReference());
             }.bind(this), this.timeInterval);
         },
         // should be overriden when extending

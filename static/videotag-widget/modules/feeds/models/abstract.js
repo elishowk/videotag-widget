@@ -5,6 +5,13 @@ define(['backbone'], function (Backbone) {
 
     return Backbone.Tastypie.Model.extend({
         'urlRoot': require.appConfig.feedsApiUrl + '/event/',
+        'validate': function () {
+            if (! this.attributes['reference']) {
+                return;
+            }
+
+            this.attributes['reference'] = parseInt(this.attributes['reference'], 10);
+        },
         'setMetaData': function (key, value) {
             var metadata = this.getMetaData();
             metadata[key] = value;

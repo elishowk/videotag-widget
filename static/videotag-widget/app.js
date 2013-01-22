@@ -51,6 +51,13 @@ define([
                 this.dataMap = new DataMap();
                 this.dataMap.initialize();
 
+				App.mediator.on('feeds::messages::new', function (data) {
+					App.dataMap.messages.addById(data.id);
+				});
+				App.mediator.on('feeds::messages::remove', function (data) {
+					//App.dataMap.messages.removeById(data.id);
+				});
+
                 /**
                  * Modules
                  */
@@ -64,18 +71,24 @@ define([
 
                     console.log('MODULE `' + moduleName + '` LOADED');
 
-                    if (loaded === 4) {
+                    if (loaded === 5) {
                         this.off('moduleLoaded');
                         this.trigger('ready');
                     }
                 }, this);
 
-                this.session.on('ready', function () {
+                this.session.once('ready', function () {
                     this.trigger('moduleLoaded', 'session');
                 }, this);
                 this.session.initialize();
 
                 this.feeds.once('ready', function () {
+                    App.dataMap.messages.fetch({
+                        'update': true,
+                        'success': function () {
+                            this.trigger('moduleLoaded', 'datamap');
+                        }.bind(this)
+                    });
                     this.trigger('moduleLoaded', 'feeds');
                 }, this);
 
@@ -83,7 +96,7 @@ define([
                     this.view.render(this.player.view, 'left');
                     this.trigger('moduleLoaded', 'player');
                 }, this);
-                App.mediator.on('player::currentReference', function (reference) {
+                App.mediator.on('player::reference::current', function (reference) {
                     this.currentReference = reference;
                 }, this);
                 // TODO created_by conf
