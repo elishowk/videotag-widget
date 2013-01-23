@@ -3,9 +3,11 @@
 define([
     'modules/ticker/views/abstract',
     'modules/ticker/views/badge',
+    'videotag/tools/sort',
 ], function (
     TickerViewsAbstract,
-    TickerViewsBadge
+    TickerViewsBadge,
+    Sort
 ) {
     'use strict';
 
@@ -19,9 +21,23 @@ define([
                 this.badges[userId] = new TickerViewsBadge({
                     'collection': App.ticker.getTicker('user', userId).collection,
                 });
-
-                this.$el.append(this.badges[userId].render().$el);
+                this.badges[userId].render();
+                this.$el.append(this.badges[userId].$el);
             }
+            //this.sort();
+            return this;
+        },
+        'sort': function () {
+            var messages = App.dataMap.messages.filter(function (model) {
+                var reference = model.get('reference');
+                return reference >= (App.currentReference - App.timeRange) && reference <= App.currentReference;
+            });
+            var usersOrder = Sort.by_createdAt_likes(messages);
+            _.each(usersOrder, function(userId) {
+                if (this.badges[userId] !== undefined) {
+                    this.$el.append(this.badges[userId].$el);
+                }
+            }, this);
 
             return this;
         },
