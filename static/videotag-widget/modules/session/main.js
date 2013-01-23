@@ -23,7 +23,7 @@ define([
                 'success': function () {
                     this.valid = true;
                     this.trigger('ready');
-                    App.mediator.emit('user::signin::success');
+                    App.mediator.emit('user::session::signin');
 
                     if (callbackSuccess) {
                         callbackSuccess();
@@ -172,7 +172,7 @@ define([
                 'success': function () {
                     this.valid = false;
 
-                    App.mediator.emit('user::signout::success');
+                    App.mediator.emit('user::session::signout');
                 }.bind(this)
             });
         }

@@ -20,15 +20,13 @@ define([
             poserFeeds.initialize(function () {
                 this.feeds.messages = poserFeeds.feed(require.appConfig.feedId);
                 this.feeds.messages.on('join', function () {
-                    App.dataMap.messages.fetch({
-                        'update': true,
-                        'success': function () {
-                            this.trigger('ready');
-                        }.bind(this)
-                    });
+                    this.trigger('ready');
                 }.bind(this));
                 this.feeds.messages.on('message.self', function (data) {
-                    App.dataMap.messages.addById(data.id);
+                    App.mediator.emit('feeds::messages::new::' + data.id, data);
+                });
+                this.feeds.messages.on('message.delete', function (data) {
+                    App.mediator.emit('feeds::messages::remove::' + data.id, data);
                 });
                 this.feeds.messages.join();
             }.bind(this));

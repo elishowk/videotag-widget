@@ -32,10 +32,8 @@ define([
                 return false;
             }
         },
+        // TODO on destroy stop listening App.mediator
         'initialize': function () {
-            this.build();
-        },
-        'build': function () {
             if (App.session.isValid() && this.model.get('created_by') === App.session.user.get('id')) {
                 this.$el.addClass('my');
             }
@@ -44,7 +42,7 @@ define([
                 this.menu.update('like', {'className': this.model.isLikedByUser() ? 'on' : '-on'});
             }, this);
 
-            App.mediator.on('player::currentReference', function (reference) {
+            App.mediator.on('player::reference::current', function (reference) {
                 if (reference < this.model.get('reference')) {
                     this.hide();
                 } else {

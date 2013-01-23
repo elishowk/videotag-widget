@@ -20,10 +20,11 @@ define([
         'events': {
             'click > .ticker > .message > .context-menu > .item.twitter': function (e) {
                 // TODO move social features out
+                // TODO add reference and username (if possible get user @twitter)
                 var url = 'https://twitter.com/intent/tweet/?text=' +
-                    $(e.target).parents('.message').find('.text > .content').text() +
+                    escape($(e.target).parents('.message').find('.text > .content').text() +
                     ' ' + window.location.href +
-                    ' @commonecoute';
+                    ' @commonecoute');
                 window.open(url);
 
                 return false;
@@ -32,7 +33,9 @@ define([
                 this.trigger('ticker::user::show', e.currentTarget.getAttribute('data-user-id'));
             },
             'click > .ticker > .message > .text > .reference': function (e) {
-                this.trigger('message::seek', parseInt($(e.currentTarget).attr('data-reference'), 10));
+                App.mediator.emit('user::messages::seek', parseInt($(e.currentTarget).attr('data-reference'), 10));
+
+                return false;
             },
             'focus textarea': function (e) {
                 if (! App.session.isValid()) {
@@ -58,8 +61,8 @@ define([
                     return;
                 }
 
-                this.trigger(
-                    'message::new',
+                App.mediator.emit(
+                    'user::messages::new',
                     e.target.value,
                     this.currentReference
                 );

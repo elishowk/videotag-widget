@@ -5,15 +5,13 @@ define([
     'backbone',
     'modules/ticker/views/main',
     'modules/ticker/views/global',
-    'modules/ticker/views/user',
-    'modules/ticker/views/reply',
+    'modules/ticker/views/user'
 ], function (
     App,
     Backbone,
     TickerViewsMain,
     TickerViewsGlobal,
-    TickerViewsUser,
-    TickerViewsReply
+    TickerViewsUser
 ) {
     'use strict';
 
@@ -30,17 +28,21 @@ define([
             this.currentTicker = this.globalTicker;
 
             this.view = new TickerViewsMain();
-            this.view.on('message::seek', function (reference) {
+            App.mediator.on('user::messages::seek', function (reference) {
                 App.mediator.emit('player::seek', reference);
             }, this);
-            this.view.on('message::new', function (text, reference) {
-                var data = {
-                    'text': text,
-                    'reference': reference
-                };
-
-                App.mediator.emit('feeds::message::new', data);
-            }, this);
+            App.mediator.on('user::messages::new', function (text, reference) {
+                // Do *NOT* use Backbone.Collection.create
+                var model = new App.dataMap.messages.model({
+                    'action': 'message.self',
+                    'feed': require.appConfig.feedId,
+                    'reference': reference + '',
+                    'metadata': JSON.stringify({
+                        'text': text + ''
+                    })
+                });
+                model.save();
+            });
             this.view.on('ticker::user::show', function (userId) {
                 this.globalTicker.hideLeft();
                 this.currentTicker = this.getTicker('user', userId).show();
@@ -57,12 +59,16 @@ define([
             this.view.render();
             this.view.appendTicker(this.globalTicker, true);
 
-            App.mediator.on('player::currentReference', function (reference) {
+            App.mediator.on('player::reference::current', function (reference) {
                 this.view.updateReference(reference);
             }, this);
-            App.mediator.on('feeds::message::user', function (model, userId) {
+            App.mediator.on('datamap::messages::add', function (model, userId) {
                 this.globalTicker.collection.add(model);
                 this.getTicker('user', userId).collection.add(model);
+            }, this);
+            App.mediator.on('datamap::messages::remove', function (model, userId) {
+                this.globalTicker.collection.remove(model);
+                this.getTicker('user', userId).collection.remove(model);
             }, this);
 
             this.trigger('ready');
@@ -78,8 +84,8 @@ define([
             if (type === 'user') {
                 ticker = new TickerViewsUser({'tickerId': tickerId});
             } else {
-                ticker = new TickerViewsReply({'tickerId': tickerId});
-            }
+				// TODO add reply type later
+			}
 
             this.view.appendTicker(ticker);
 

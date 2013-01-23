@@ -13,19 +13,26 @@ define([
         'className': 'ticker global',
         'badges': {},
         'pushMessage': function (messageModel) {
-            var badgeView;
             var userId = messageModel.get('created_by');
 
             if (! this.badges[userId]) {
-                this.badges[userId] = new TickerViewsBadge();
+                this.badges[userId] = new TickerViewsBadge({
+                    'collection': App.ticker.getTicker('user', userId).collection,
+                });
+
+                this.$el.append(this.badges[userId].render().$el);
             }
 
-            badgeView = this.badges[userId];
-            badgeView.pushModel(messageModel);
-
-            this.$el.append(badgeView.$el);
-
             return this;
+        },
+        'removeMessage': function (messageModel) {
+            var badgeView = this.badges[userId];
+
+            if (! badgeView) {
+                return this;
+            }
+
+            badgeView.render();
         }
     });
 });

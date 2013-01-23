@@ -40,14 +40,14 @@ define([
             }
         },
         'render': function () {
-            App.mediator.on('user::signin::success', function () {
+            App.mediator.on('user::session::signin', function () {
                 this.update('session', {
                     'title': 'sign out', // TODO i18n
                     'className': 'on'
                 });
             }, this);
 
-            App.mediator.on('user::signout::success', function () {
+            App.mediator.on('user::session::signout', function () {
                 this.update('session', {
                     'title': 'sign in', // TODO i18n
                     'className': '-on'

@@ -6,11 +6,20 @@ define(['backbone'], function (Backbone) {
     return Backbone.Tastypie.Collection.extend({
         'feedId': null,
         'urlRoot': require.appConfig.feedsApiUrl + '/event/',
-        'addById': function (id) {
+        'addById': function (id, callback) {
             var model = new this.model({'id': id});
             model.fetch({'success': function () {
                 this.add(model);
+
+                if (callback) {
+                    callback(model);
+                }
             }.bind(this)});
+        },
+        'removeById': function (id) {
+            this.remove(this.getById(id));
+
+            return this;
         }
     });
 });
