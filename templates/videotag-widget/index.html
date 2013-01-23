@@ -20,10 +20,11 @@
                     'poserApiUrl': '{{ poserApiUrl }}',
                     'melomaniacApiUrl': '{{ melomaniacApiUrl }}',
                     'sockjsUrl': '{{ sockjsUrl }}',
-                    'loginUrl': '{{ request.build_absolute_uri|slice:':-1' }}{% url 'account_login' %}',
-                    'logoutUrl': '{{ request.build_absolute_uri|slice:':-1' }}{% url 'account_logout' %}',
-                    'signupUrl': '{{ request.build_absolute_uri|slice:':-1' }}{% url 'account_signup' %}',
-                    'accountSettingsUrl': '{{ request.build_absolute_uri|slice:':-1' }}{% url 'account_settings' %}',
+                    'loginUrl': '{% url 'account_login' %}',
+                    'logoutUrl': '{% url 'account_logout' %}',
+                    'signupUrl': '{% url 'account_signup' %}',
+                    'accountSettingsUrl': '{% url 'account_settings' %}',
+                    'feedId': '{{  current_page.slug }}'
                 };
 
                 this.location.search
