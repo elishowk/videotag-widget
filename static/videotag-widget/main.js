@@ -8,6 +8,7 @@ require.config({
         'noext':        'lib/require-noext-0.3.1.min',
         'backbone':     'lib/backbone-0.9.9.min',
         'app':          'videotag-widget/app',
+        'config':       'videotag-widget/config/main',
         'modules':      'videotag-widget/modules',
     },
     'shim': {
@@ -31,13 +32,17 @@ require.config({
 });
 
 define([
+    'config',
     'app'
-], function (App) {
+], function (Config, App) {
     'use strict';
 
     App.on('ready', function () {
         $(document.body).append(App.view.$el);
         console.log('APP READY');
     });
-    App.initialize();
+    Config.on('ready', function () {
+        App.initialize();
+    });
+    Config.initialize()
 });
