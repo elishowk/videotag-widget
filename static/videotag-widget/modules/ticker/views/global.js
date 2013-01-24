@@ -32,7 +32,7 @@ define([
                 var reference = model.get('reference');
                 return reference >= (App.currentReference - App.timeRange) && reference <= App.currentReference;
             });
-            var usersOrder = Sort.by_createdAt_likes(messages);
+            var usersOrder = Sort.by_relative_createdAt_likes(messages);
             _.each(usersOrder, function(userId) {
                 if (this.badges[userId] !== undefined) {
                     this.$el.append(this.badges[userId].$el);
