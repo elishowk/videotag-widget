@@ -42,6 +42,7 @@ define([
         console.log('APP READY');
     });
     Config.on('ready', function () {
+        App.config = Config;
         App.initialize();
     });
     Config.initialize()

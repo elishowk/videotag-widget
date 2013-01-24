@@ -2,7 +2,8 @@
 /*global define, _*/
 
 define([
-    'backbone'
+    'backbone',
+    'lib/raven-0.6.min'
 ], function (
     Backbone
 ) {
@@ -30,7 +31,10 @@ define([
                 });
                 return this;
             }.bind(this));
-        }
+        },
+        getVideoId: function() {
+            return parseUri(this.page.get('video'))['queryKey']['v'];
+        },
     }, Backbone.Events);
     return Config;
 });
