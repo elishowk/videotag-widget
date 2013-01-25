@@ -10,9 +10,11 @@ define([
     var Config = function () {};
 
     _.extend(Config.prototype, {
-        'data': {},
+        'data': {
+            'csrftoken': $('input[name=csrfmiddlewaretoken]').attr('value')
+        },
         'initialize': function () {
-            this.data = require.appConfig;
+            this.data = _.defaults(require.appConfig, this.data);
             $.ajax({
                 'url': this.data.poserApiUrl + '/page/' + this.data.pageId,
                 'type': 'GET',

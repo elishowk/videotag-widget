@@ -65,7 +65,7 @@ define([
                         'url': '/account/signup/',
                         'type': 'POST',
                         'headers': {
-                            'X-CSRFToken': App.getCookieObject().csrftoken
+                            'X-CSRFToken': App.config.csrftoken
                         },
                         'data': data,
                         'success': function (data) {
@@ -133,7 +133,7 @@ define([
                         'url': '/account/login/',
                         'type': 'POST',
                         'headers': {
-                            'X-CSRFToken': App.getCookieObject().csrftoken
+                            'X-CSRFToken': App.config.csrftoken
                         },
                         'data': data,
                         'success': function (data) {
@@ -167,7 +167,7 @@ define([
                 'url': '/account/logout/',
                 'type': 'POST',
                 'headers': {
-                    'X-CSRFToken': App.getCookieObject().csrftoken
+                    'X-CSRFToken': App.config.csrftoken
                 },
                 'success': function () {
                     this.valid = false;
