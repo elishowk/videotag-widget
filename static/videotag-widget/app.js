@@ -9,11 +9,9 @@ define([
 ) {
     'use strict';
 
-    // TODO get from conf
-    require.appConfig.feedId = 'widget-1';
-
     var App = _.extend({
         'currentReference': 0,
+        'timeRange': 3 * 60,
         'initialize': function () {
             require([
                 'modules/ticker/main',

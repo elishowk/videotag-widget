@@ -20,7 +20,6 @@ define([
         'collection': null,
         'model': null,
         'updateThrottle': 1000,
-        'timeRange': 60 * 3,
         'initialize': function () {
             App.mediator.on('player::reference::current', _.throttle(function () {
                 this.render();
@@ -30,7 +29,7 @@ define([
             var models = this.collection.filter(function (model) {
                 var reference = model.get('reference');
 
-                return reference >= (App.currentReference - this.timeRange) && reference <= App.currentReference;
+                return reference >= (App.currentReference - App.timeRange) && reference <= App.currentReference;
             }, this);
 
             if (models.length === 0) {
