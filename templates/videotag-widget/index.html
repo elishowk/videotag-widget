@@ -24,8 +24,8 @@
                     'logoutUrl': '{% url 'account_logout' %}',
                     'signupUrl': '{% url 'account_signup' %}',
                     'accountSettingsUrl': '{% url 'account_settings' %}',
-                    'feedId': '{{ current_page.slug }}'
-                    'feedId': '{{  current_page.slug }}'
+                    'feedId': '{{ current_page.slug }}',
+                    'pageId': '{{  current_page.id }}'
                 };
 
                 this.location.search
