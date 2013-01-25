@@ -25,14 +25,5 @@ define([
 
             return this;
         },
-        'removeMessage': function (messageModel) {
-            var badgeView = this.badges[userId];
-
-            if (! badgeView) {
-                return this;
-            }
-
-            badgeView.render();
-        }
     });
 });

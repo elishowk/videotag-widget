@@ -45,5 +45,7 @@ define([
 
             return this;
         },
+        // by default does nothing
+        'removeMessage': function () {}
     });
 });

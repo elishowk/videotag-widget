@@ -5,7 +5,6 @@ define(['backbone'], function (Backbone) {
 
     return Backbone.Tastypie.Collection.extend({
         'feedId': null,
-        'urlRoot': require.appConfig.feedsApiUrl + '/event/',
         'addById': function (id, callback) {
             var model = new this.model({'id': id});
             model.fetch({'success': function () {

@@ -19,15 +19,7 @@ define([
                 }
             },
             'click > .item.back': function () {
-                if (! this.options.back || this.history.length === 0) {
-                    return;
-                }
-
-                this.history.pop()();
-
-                if (this.history.length === 0) {
-                    this.hide('back');
-                }
+                this.back();
             }
         },
         'initialize': function () {
@@ -57,6 +49,22 @@ define([
             this.add('session', {'title': 'sign in'});
 
             return this;
+        },
+        'pushHistory': function (callback) {
+            this.history.push(callback);
+
+            this.show('back');
+        },
+        'back': function () {
+            if (! this.options.back || this.history.length === 0) {
+                return;
+            }
+
+            this.history.pop()();
+
+            if (this.history.length === 0) {
+                this.hide('back');
+            }
         }
     });
 });

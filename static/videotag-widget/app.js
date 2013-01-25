@@ -51,11 +51,11 @@ define([
                 this.dataMap = new DataMap();
                 this.dataMap.initialize();
 
-				App.mediator.on('feeds::messages::new', function (data) {
+				App.mediator.on('feeds::messages::create', function (data) {
 					App.dataMap.messages.addById(data.id);
 				});
 				App.mediator.on('feeds::messages::remove', function (data) {
-					//App.dataMap.messages.removeById(data.id);
+					App.dataMap.messages.removeById(data.id);
 				});
 
                 /**

@@ -35,9 +35,15 @@ define([
 ], function (App) {
     'use strict';
 
-    App.on('ready', function () {
-        $(document.body).append(App.view.$el);
-        console.log('APP READY');
-    });
-    App.initialize();
+    // getting the csrf token (django === ugly)
+    $('<iframe style="display: none">')
+        .on('load', function () {
+            App.on('ready', function () {
+                $(document.body).append(App.view.$el);
+                console.log('APP READY');
+            });
+            App.initialize();
+        })
+        .attr('src', window.location.origin)
+        .appendTo(document.body)
 });

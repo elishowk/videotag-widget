@@ -7,8 +7,10 @@ define([
     'use strict';
 
     return FeedsCollectionsAbstract.extend({
+        'urlRoot': require.appConfig.feedsApiUrl + '/message/',
         'model': MessageModel,
         'initialize': function (models, options) {
+            this.filters.action = 'message.self';
             this.filters.feed = options.feedId;
         }
     });

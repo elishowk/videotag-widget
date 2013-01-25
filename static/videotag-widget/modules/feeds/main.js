@@ -23,10 +23,16 @@ define([
                     this.trigger('ready');
                 }.bind(this));
                 this.feeds.messages.on('message.self', function (data) {
-                    App.mediator.emit('feeds::messages::new::' + data.id, data);
+                    App.mediator.emit('feeds::messages::create::' + data.id, data);
                 });
-                this.feeds.messages.on('message.delete', function (data) {
+                this.feeds.messages.on('message.self.delete', function (data) {
                     App.mediator.emit('feeds::messages::remove::' + data.id, data);
+                });
+                this.feeds.messages.on('message.like', function (data) {
+                    App.mediator.emit('feeds::messages::like::' + data.parent, data);
+                });
+                this.feeds.messages.on('message.like.delete', function (data) {
+                    App.mediator.emit('feeds::messages::like::' + data.parent, data);
                 });
                 this.feeds.messages.join();
             }.bind(this));

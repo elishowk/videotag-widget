@@ -32,16 +32,19 @@ define([
                 return false;
             }
         },
-        // TODO on destroy stop listening App.mediator
         'initialize': function () {
             if (App.session.isValid() && this.model.get('created_by') === App.session.user.get('id')) {
                 this.$el.addClass('my');
             }
 
             this.model.on('change:like', function () {
-                this.menu.update('like', {'className': this.model.isLikedByUser() ? 'on' : '-on'});
+                this.menu.update('like', {
+                    'className': (this.model.likeUser ? 'red ' : '-red ') +
+                        (this.model.likeCount > 0 ? 'on' : '-on')
+                });
             }, this);
 
+            // TODO move up (ticker/views/user or even ticker/views/main)
             App.mediator.on('player::reference::current', function (reference) {
                 if (reference < this.model.get('reference')) {
                     this.hide();
@@ -54,10 +57,7 @@ define([
             this.menu = new DefaultViewsMenu();
             this.menu.add('delete');
             this.menu.add('twitter');
-            this.menu.add('like', {
-                'className': this.model.isLikedByUser() ? 'on' : '',
-                'attrs': {'data-like-count': this.model.get('metadata').liked}
-            });
+            this.menu.add('like');
 
             this.$el.append(this.menu.$el);
         },

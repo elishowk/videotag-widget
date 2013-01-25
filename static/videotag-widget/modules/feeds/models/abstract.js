@@ -4,29 +4,36 @@ define(['backbone'], function (Backbone) {
     'use strict';
 
     return Backbone.Tastypie.Model.extend({
-        'urlRoot': require.appConfig.feedsApiUrl + '/event/',
-        'validate': function () {
-            if (! this.attributes['reference']) {
-                return;
+        'parse': function (data) {
+            if (! data || ! data['reference']) {
+                return data;
             }
 
-            this.attributes['reference'] = parseInt(this.attributes['reference'], 10);
+            data['reference'] = parseInt(data['reference'], 10);
+
+            return data;
         },
-        'setMetaData': function (key, value) {
-            var metadata = this.getMetaData();
+        'setMetadata': function (key, value) {
+            var metadata = this.getMetadata();
             metadata[key] = value;
 
             this.set('metadata', JSON.stringify(metadata));
         },
-        'getMetaData': function (key) {
+        'getMetadata': function (key) {
+			var metadata = this.get('metadata');
+
+			if (! metadata) {
+				return;
+			}
+
             if (key) {
-                return JSON.parse(this.get('metadata'))[key];
+                return JSON.parse(metadata)[key];
             } else {
-                return JSON.parse(this.get('metadata'));
+                return JSON.parse(metadata);
             }
         },
-        'unsetMetaData': function (key) {
-            var metadata = this.getMetaData();
+        'unsetMetadata': function (key) {
+            var metadata = this.getMetadata();
             delete metadata[key];
 
             this.set('metadata', JSON.stringify(metadata));

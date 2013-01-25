@@ -65,29 +65,31 @@ define([
             this.model = model;
             this.model.on('change:like', this.onLike, this);
 
-            window.setImmediate(function () {
-                // TODO should *NOT* be able to delete message after signout
-                if (App.session.isValid() && this.model.get('created_by') === App.session.user.get('id')) {
-                    this.$el.addClass('my');
-                }
+            // TODO should *NOT* be able to see delete button after signout
+            if (App.session.isValid() && this.model.get('created_by') === App.session.user.get('id')) {
+                this.$el.addClass('my');
+            }
 
-                this.model.fetchUser(function (userModel) {
-                    this.$el
-                        .html(_.template(tpl, {
-                            'model': this.model,
-                            'user': userModel,
-                            'Format': Format
-                        }))
-                        .attr('data-user-id', this.model.get('created_by'));
-                    this.buildMenu();
-                    this.show();
-                }.bind(this));
+            this.model.fetchUser(function (userModel) {
+                this.$el
+                    .html(_.template(tpl, {
+                        'model': this.model,
+                        'user': userModel,
+                        'Format': Format
+                    }))
+                    .attr('data-user-id', this.model.get('created_by'));
+                this.buildMenu();
+                this.onLike();
+                this.show();
             }.bind(this));
 
             return this;
         },
         'onLike': function () {
-            this.menu.update('like', {'className': this.model.isLikedByUser() ? 'on' : '-on'});
+            this.menu.update('like', {
+                'className': (this.model.likeUser ? 'red ' : '-red ') +
+                    (this.model.likeCount > 0 ? 'on' : '-on')
+            });
         },
         'show': function () {
             this.$el.addClass('on');

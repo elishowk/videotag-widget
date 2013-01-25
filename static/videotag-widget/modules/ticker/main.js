@@ -31,7 +31,7 @@ define([
             App.mediator.on('user::messages::seek', function (reference) {
                 App.mediator.emit('player::seek', reference);
             }, this);
-            App.mediator.on('user::messages::new', function (text, reference) {
+            App.mediator.on('user::messages::create', function (text, reference) {
                 // Do *NOT* use Backbone.Collection.create
                 var model = new App.dataMap.messages.model({
                     'action': 'message.self',
@@ -50,7 +50,7 @@ define([
                     'show': this.globalTicker,
                     'hide': this.currentTicker,
                 });
-                App.menu.back(function () {
+                App.menu.pushHistory(function () {
                     var tickers = this.history.pop();
                     tickers['show'].show();
                     tickers['hide'].hideRight();
@@ -62,7 +62,7 @@ define([
             App.mediator.on('player::reference::current', function (reference) {
                 this.view.updateReference(reference);
             }, this);
-            App.mediator.on('datamap::messages::add', function (model, userId) {
+            App.mediator.on('datamap::messages::create', function (model, userId) {
                 this.globalTicker.collection.add(model);
                 this.getTicker('user', userId).collection.add(model);
             }, this);

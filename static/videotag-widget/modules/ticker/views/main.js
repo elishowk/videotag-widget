@@ -62,7 +62,7 @@ define([
                 }
 
                 App.mediator.emit(
-                    'user::messages::new',
+                    'user::messages::create',
                     e.target.value,
                     this.currentReference
                 );

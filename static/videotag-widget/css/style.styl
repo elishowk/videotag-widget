@@ -216,9 +216,15 @@ body {
                 }
 
                 &.on {
-                    opacity: 1;
+                    background-color: $color_bg_4;
 
+                    opacity: 1;
+                }
+
+                &.red {
                     background-color: $color_err;
+
+                    opacity: 1;
                 }
 
                 &.replies {
@@ -446,7 +452,7 @@ body {
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 0;
+    z-index: -1;
 
     display: table;
 

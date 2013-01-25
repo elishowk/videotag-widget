@@ -17,7 +17,7 @@ define([
          */
         this.messages = new FeedsCollectionsMessage(null, {'feedId': require.appConfig.feedId});
         this.messages.on('add', function (model) {
-            App.mediator.emit('datamap::messages::add::' + model.get('created_by'), model, model.get('created_by'));
+            App.mediator.emit('datamap::messages::create::' + model.get('created_by'), model, model.get('created_by'));
         });
         this.messages.on('remove', function (model) {
             App.mediator.emit('datamap::messages::remove::' + model.get('created_by'), model, model.get('created_by'));
