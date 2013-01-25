@@ -11,6 +11,13 @@ $color_bg_5 = #a9a9ad;
 $color_bg_6 = #b9b9bd;
 $color_err = #f00;
 $color_warn = #fa0;
+$color_white = #fff;
+$color_light = #95959d;
+$color_medium = #70706f;
+$color_dark = #50504f;
+$color_bluish = #b9b9bf;
+
+@import url('http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Droid+Sans+Mono');
 
 * {
     text-rendering: geometricPrecision;
@@ -24,6 +31,9 @@ body {
     font-family: 'Droid Sans', 'Lucida Grande', sans-serif;
     font-size: 14px;
 
+    background-image: url('../assets/bg_white.png');
+    background-repeat: repeat;
+
     > iframe {
         opacity: 0;
     }
@@ -36,11 +46,9 @@ body {
     bottom: 0;
     z-index: 2;
 
-    background-color: $color_warn;
-
     overflow: hidden;
 
-    width: 360px;
+    width: 312px;
 
     > .menu {
         position: absolute;
@@ -51,8 +59,10 @@ body {
 
         border-radius: 2px;
 
-        background-color: $color_err;
-        color: $color_fg_5;
+        background-image: url('../assets/bg_grey.png');
+        background-repeat: repeat;
+
+        box-shadow: 1px 1px 1px 0 lighten($color_light, 50%);
 
         text-align: right;
 
@@ -61,7 +71,7 @@ body {
 
             padding: 4px 8px;
 
-            color: $color_fg_5;
+            color: $color_dark;
 
             cursor: pointer;
 
@@ -87,13 +97,13 @@ body {
 
 .tickers > .ticker {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 6px;
+    right: 6px;
     bottom: 69px;
-    left: 8px;
+    left: 6px;
 
-    overflow-x: hidden;
     overflow-y: auto;
+    overflow-x: hidden;
 
     -webkit-transition-duration: .2s;
     -webkit-transition-property: bottom left right;
@@ -105,19 +115,22 @@ body {
 
         display: none;
 
-        margin-bottom: 8px;
-        padding: 24px 8px 8px;
+        margin: 0 2px 8px -1px;
+        padding: 24px 8px 6px;
 
-        border-radius: 2px;
+        border-radius: 4px 2px 2px 4px;
 
-        background-color: $color_fg_1;
+        background-image: url('../assets/bg_grey.png');
+        background-repeat: repeat;
+
+        box-shadow: 1px 1px 1px 0 lighten($color_light, 50%);
 
         .username {
             position: absolute;
             top: 4px;
             left: 51px;
 
-            color: $color_bg_3;
+            color: $color_medium;
 
             cursor: pointer;
         }
@@ -127,9 +140,10 @@ body {
 
             display: inline-block;
 
-            width: 286px;
+            width: 238px;
 
             margin: 1px 0 0 43px;
+            padding-bottom: 2px;
 
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -141,7 +155,10 @@ body {
 
                 border-radius: 2px;
 
-                background-color: $color_fg_2;
+                background-color: rgba($color_bluish, .3);
+                color: $color_medium;
+
+                border: 1px solid darken(rgba($color_bluish, .3), 5%);
 
                 font-size: 12px;
 
@@ -151,17 +168,15 @@ body {
                 -webkit-transition-property: background-color;
 
                 &:hover {
-                    background-color: $color_bg_4;
+                    background-color: rgba(darken($color_bluish, 5%), .4);
+                    color: $color_dark;
                 }
             }
 
             .content {
                 margin-left: 2px;
 
-                &::before,
-                &::after {
-                    content: '';
-                }
+                color: $color_dark;
             }
         }
 
@@ -176,7 +191,6 @@ body {
 
             border-radius: 2px;
 
-            background-color: $color_fg_5;
             background-size: 36px;
 
             cursor: pointer;
@@ -199,6 +213,8 @@ body {
                 width: 18px;
                 height: 18px;
 
+                margin-left: 1px;
+
                 border-radius: 2px;
 
                 background-position: 50% 50%;
@@ -212,48 +228,53 @@ body {
                 -webkit-transition-property: background-color opacity;
 
                 &:hover {
-                    background-color: $color_bg_4;
+                    background-color: rgba($color_bluish, .4);
                 }
 
                 &.on {
-                    background-color: $color_bg_4;
-
-                    opacity: 1;
-                }
-
-                &.red {
-                    background-color: $color_err;
+                    background-color: $color_bluish;
 
                     opacity: 1;
                 }
 
                 &.replies {
-                    background-image: url('../assets/chat.svg');
+                    background-image: url('../assets/chat_dark.svg');
                 }
 
                 &.twitter {
-                    background-image: url('../assets/twitter.svg');
+                    background-image: url('../assets/twitter_dark.svg');
                     background-size: 100%;
                 }
 
                 &.like {
-                    background-image: url('../assets/like.svg');
+                    background-image: url('../assets/like_dark.svg');
+
+                    &.on {
+                        background-image: url('../assets/like.svg');
+                    }
+
+                    &.red {
+                        background-image: url('../assets/like.svg');
+                        background-color: darken($color_bluish, 10%);
+
+                        opacity: 1;
+                    }
                 }
 
                 &.delete {
                     display: none;
 
-                    background-image: url('../assets/delete.svg');
+                    background-image: url('../assets/delete_dark.svg');
                 }
 
                 &.options {
-                    background-image: url('../assets/gear.svg');
+                    background-image: url('../assets/gear_dark.svg');
                 }
             }
         }
 
         &.promoted {
-            background-color: $color_fg_1;
+            // TODO background-color: $color_fg_1;
 
             &::before {
                 content: 'VIP';
@@ -268,8 +289,8 @@ body {
 
                 -webkit-transform: rotate(-45deg);
 
-                background-color: $color_bg_3;
-                color: $color_fg_3;
+                // TODO background-color: $color_bg_3;
+                // TODO color: $color_fg_3;
 
                 text-align: center;
             }
@@ -316,7 +337,7 @@ body {
         > .message {
             margin-left: 0px;
 
-            background-color: $color_fg_1;
+            // TODO background-color: $color_fg_1;
 
             .text {
                 overflow: visible;
@@ -331,7 +352,7 @@ body {
             &.post {
                 margin-left: 0;
 
-                background-color: $color_bg_6;
+                // TODO background-color: $color_bg_6;
 
                 q {
                     margin-left: 2px;
@@ -359,10 +380,11 @@ body {
     z-index: 2;
 
     border-radius: 2px;
-    border: 1px solid $color_fg_2;
 
-    background-color: $color_fg_5;
+    background-color: $color_white;
     background-origin:content-box;
+
+    box-shadow: 1px 1px 1px 0 lighten($color_light, 50%);
 
     .reference {
         position: absolute;
@@ -373,8 +395,11 @@ body {
         width: 76px;
         line-height: 25px;
 
-        background-color: $color_err;
-        color: $color_fg_5;
+        border-radius: 2px 0 0 2px;
+
+        background-image: url('../assets/bg_grey.png');
+        background-repeat: repeat;
+        color: $color_medium;
 
         font-family: 'Droid Sans Mono', monospace;
         text-align: center;
@@ -390,7 +415,7 @@ body {
 
         font-family: 'Droid Sans Mono', monospace;
 
-        color: $color_bg_5;
+        color: $color_light;
 
         opacity: 0;
 
@@ -413,12 +438,14 @@ body {
 
         box-sizing: content-box;
 
-        width: 250px;
+        width: 202px;
 
         padding: 4px 8px 0 0;
 
         border: 0;
         outline: 0;
+
+        color: $color_dark;
 
         resize: none;
 
@@ -487,7 +514,7 @@ body {
 
         height: 100%;
 
-        background-color: rgba(0,0,0,.85);
+        background-color: rgba($color_white, .85);
     }
 
     > .wrap {
@@ -497,7 +524,10 @@ body {
 
         border-radius: 2px;
 
-        background-color: $color_fg_5;
+        background-image: url('../assets/bg_white.png');
+        background-repeat: repeat;
+
+        box-shadow: 1px 1px 1px 0 lighten($color_light, 50%);
 
         text-align: left;
 
@@ -507,8 +537,12 @@ body {
 
             border-radius: 2px;
 
-            background-color: $color_warn;
-            color: $color_fg_5;
+            background-color: $color_bluish;
+            background-image: url('../assets/bg_grey.png');
+            background-repeat: repeat;
+            color: $color_dark;
+
+            text-shadow: 1px 1px 0 $color_white;
         }
 
         p {
@@ -529,7 +563,7 @@ body {
                 border-radius: 2px;
 
                 background-color: $color_err;
-                color: $color_fg_5;
+                color: $color_white;
 
                 &:first-letter {
                     text-transform: uppercase;
@@ -546,7 +580,7 @@ body {
             padding: 4px;
 
             border-radius: 2px;
-            border: 1px solid $color_bg_4;
+            border: 1px solid $color_bluish;
 
             &:not([type="submit"]) {
                 display: block;
@@ -555,16 +589,21 @@ body {
             }
 
             &[type="submit"] {
+                border: 1px solid darken(rgba($color_bluish, .3), 5%);
+
                 &.submit {
-                    background-color: $color_warn;
-                    color: $color_bg_1;
+                    background-color: rgba($color_bluish, .3);
+                    color: $color_dark;
                 }
 
                 &.sign-up {
-                    border: 1px solid $color_bg_1;
+                    background-color: rgba($color_bluish, .2);
+                    color: $color_light;
+                }
 
-                    background-color: $color_err;
-                    color: $color_fg_5;
+                &:hover {
+                    background-color: rgba($color_dark, .5);
+                    color: $color_white;
                 }
             }
         }

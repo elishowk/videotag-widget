@@ -30,6 +30,18 @@ define([
 
                 return false;
             },
+            'keydown input': function (e) {
+                if (e.keyCode !== 13 /* ENTER */) {
+                    return;
+                }
+                this.reset();
+                this.trigger('submit', {
+                    'email': this.$el.find('input.email').val(),
+                    'password': this.$el.find('input.password').val()
+                });
+
+                return false;
+            },
         },
         'render': function () {
             this.$el.html(tpl);
