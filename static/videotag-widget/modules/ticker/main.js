@@ -35,7 +35,7 @@ define([
                 // Do *NOT* use Backbone.Collection.create
                 var model = new App.dataMap.messages.model({
                     'action': 'message.self',
-                    'feed': require.appConfig.feedId,
+                    'feed': App.config.feedId,
                     'reference': reference + '',
                     'metadata': JSON.stringify({
                         'text': text + ''

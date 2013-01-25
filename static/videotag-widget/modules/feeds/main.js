@@ -12,13 +12,13 @@ define([
     'use strict';
 
     var Feeds = function () {};
-    var poserFeeds = feeds(require.appConfig.sockjsUrl);
+    var poserFeeds = feeds(App.config.sockjsUrl);
 
     _.extend(Feeds.prototype, Backbone.Events, {
         'feeds': {},
         'initialize': function () {
             poserFeeds.initialize(function () {
-                this.feeds.messages = poserFeeds.feed(require.appConfig.feedId);
+                this.feeds.messages = poserFeeds.feed(App.config.feedId);
                 this.feeds.messages.on('join', function () {
                     this.trigger('ready');
                 }.bind(this));

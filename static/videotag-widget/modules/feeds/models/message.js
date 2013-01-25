@@ -4,7 +4,7 @@ define(['modules/feeds/models/abstract'], function (FeedsModelsAbstract) {
     'use strict';
 
     return FeedsModelsAbstract.extend({
-        'urlRoot': require.appConfig.feedsApiUrl + '/message/',
+        'urlRoot': App.config.feedsApiUrl + '/message/',
         'likeCount': 0,
         'likeUser': false,
         'parse': function (data) {
@@ -40,7 +40,7 @@ define(['modules/feeds/models/abstract'], function (FeedsModelsAbstract) {
 
             if (this.likeUser) {
                 $.ajax({
-                    'url': require.appConfig.feedsApiUrl + '/like/' + this.likeUser,
+                    'url': App.config.feedsApiUrl + '/like/' + this.likeUser,
                     'type': 'DELETE',
                     'dataType': 'json',
                     'contentType': 'application/json',
@@ -51,13 +51,13 @@ define(['modules/feeds/models/abstract'], function (FeedsModelsAbstract) {
                 });
             } else {
                 $.ajax({
-                    'url': require.appConfig.feedsApiUrl + '/like/',
+                    'url': App.config.feedsApiUrl + '/like/',
                     'type': 'POST',
                     'dataType': 'json',
                     'contentType': 'application/json',
                     'data': JSON.stringify({
                         'action': 'message.like',
-                        'feed': require.appConfig.feedId,
+                        'feed': App.config.feedId,
                         'parent': this.get('id')
                     }),
                     'success': function (data) {

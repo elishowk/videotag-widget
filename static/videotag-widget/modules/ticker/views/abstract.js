@@ -15,7 +15,7 @@ define([
         'messages': {},
         'collection': null,
         'initialize': function () {
-            this.collection = new FeedsCollectionsMessage(null, {'feedId': require.appConfig.feedId});
+            this.collection = new FeedsCollectionsMessage(null, {'feedId': App.config.feedId});
 
             if (this.comparator) {
                 this.collection.comparator = this.comparator;

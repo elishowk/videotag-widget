@@ -7,7 +7,7 @@ define([
     'use strict';
 
     return FeedsCollectionsAbstract.extend({
-        'urlRoot': require.appConfig.feedsApiUrl + '/message/',
+        'urlRoot': App.config.feedsApiUrl + '/message/',
         'model': MessageModel,
         'initialize': function (models, options) {
             this.filters.action = 'message.self';

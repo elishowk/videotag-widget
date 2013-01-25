@@ -98,7 +98,7 @@ define([
                     this.currentReference = reference;
                 }, this);
                 // TODO created_by conf
-                this.player.initialize(this.config.getVideoId());
+                this.player.initialize(this.config.page.videoId);
 
                 this.ticker.once('ready', function () {
                     this.view.render(this.ticker.view, 'right');
