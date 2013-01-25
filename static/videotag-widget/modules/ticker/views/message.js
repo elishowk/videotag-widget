@@ -1,0 +1,90 @@
+/*global define, _*/
+
+define([
+    'app',
+    'backbone',
+    'modules/default/views/menu',
+    'format/main',
+    'modules/ticker/templates/message.tpl'
+], function (
+    App,
+    Backbone,
+    DefaultViewsMenu,
+    Format,
+    tpl
+) {
+    'use strict';
+
+    return Backbone.View.extend({
+        'className': 'message',
+        'tagName': 'div',
+        'model': null,
+        'menu': null,
+        'events': {
+            'click > .context-menu > .item.delete': function () {
+                this.model.destroy();
+
+                return false;
+            },
+            'click > .context-menu > .item.like': function () {
+                this.model.like();
+
+                return false;
+            }
+        },
+        'initialize': function () {
+            if (App.session.isValid() && this.model.get('created_by') === App.session.user.get('id')) {
+                this.$el.addClass('my');
+            }
+
+            this.model.on('change:like', function () {
+                this.menu.update('like', {
+                    'className': (this.model.likeUser ? 'red ' : '-red ') +
+                        (this.model.likeCount > 0 ? 'on' : '-on')
+                });
+            }, this);
+
+            // TODO move up (ticker/views/user or even ticker/views/main)
+            App.mediator.on('player::reference::current', function (reference) {
+                if (reference < this.model.get('reference')) {
+                    this.hide();
+                } else {
+                    this.show();
+                }
+            }, this);
+        },
+        'buildMenu': function () {
+            this.menu = new DefaultViewsMenu();
+            this.menu.add('delete');
+            this.menu.add('twitter');
+            this.menu.add('like');
+
+            this.$el.append(this.menu.$el);
+        },
+        'render': function () {
+            this.model.fetchUser(function (userModel) {
+                this.$el
+                    .attr('id', 'message-' + this.model.get('id'))
+                    .html(_.template(tpl, {
+                        'model': this.model,
+                        'user': userModel,
+                        'Format': Format
+                    }));
+
+                this.buildMenu();
+            }.bind(this));
+
+            return this;
+        },
+        'show': function () {
+            this.$el.addClass('on');
+
+            return this;
+        },
+        'hide': function () {
+            this.$el.removeClass('on');
+
+            return this;
+        },
+    });
+});

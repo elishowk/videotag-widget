@@ -1,0 +1,52 @@
+{% load static %}
+{% load url from future %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8" />
+        <title>CommonPlay Widget 1.0</title>
+        <link rel="stylesheet" href="{% get_static_prefix %}videotag-widget/css/reset.css" />
+        <link rel="stylesheet" href="{% get_static_prefix %}videotag-widget/css/style.css" />
+    </head>
+    <body>
+        <script>
+            (function () {
+                /**
+                 * retrieve config
+                 */
+                var config = {
+                    'baseUrl': '{% get_static_prefix %}',
+                    'feedsApiUrl': '{{ feedsApiUrl }}',
+                    'poserApiUrl': '{{ poserApiUrl }}',
+                    'melomaniacApiUrl': '{{ melomaniacApiUrl }}',
+                    'sockjsUrl': '{{ sockjsUrl }}',
+                    'loginUrl': '{% url 'account_login' %}',
+                    'logoutUrl': '{% url 'account_logout' %}',
+                    'signupUrl': '{% url 'account_signup' %}',
+                    'accountSettingsUrl': '{% url 'account_settings' %}',
+                    'feedId': '{{ current_page.slug }}',
+                    'pageId': '{{ current_page.id }}'
+                };
+
+                this.location.search
+                    .substr(1)
+                    .split('&')
+                    .forEach(function (param) {
+                        param = param.split('=');
+                        config[param[0]] = unescape(param[1]) || '';
+                    });
+
+                /**
+                 * requirejs
+                 */
+                var script = document.createElement('script');
+                script.addEventListener('load', function () {
+                    require.appConfig = config;
+                });
+                script.setAttribute('src', config.baseUrl + 'lib/require-2.1.2.min.js');
+                script.setAttribute('data-main', config.baseUrl + 'videotag-widget/main.js');
+                document.head.appendChild(script);
+            }).call(window);
+        </script>
+    </body>
+</html>
