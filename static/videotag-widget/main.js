@@ -8,6 +8,7 @@ require.config({
         'noext':        'lib/require-noext-0.3.1.min',
         'backbone':     'lib/backbone-0.9.9.min',
         'app':          'videotag-widget/app',
+        'config':       'videotag-widget/config/main',
         'modules':      'videotag-widget/modules',
     },
     'shim': {
@@ -31,8 +32,9 @@ require.config({
 });
 
 define([
-    'app'
-], function (App) {
+    'app',
+    'config'
+], function (App, Config) {
     'use strict';
 
     // getting the csrf token (django === ugly)
@@ -42,7 +44,11 @@ define([
                 $(document.body).append(App.view.$el);
                 console.log('APP READY');
             });
-            App.initialize();
+            Config.on('ready', function () {
+                App.config = Config;
+                App.initialize();
+            });
+            Config.initialize()
         })
         .attr('src', window.location.origin)
         .appendTo(document.body)
