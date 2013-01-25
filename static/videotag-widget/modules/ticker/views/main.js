@@ -18,18 +18,13 @@ define([
         'referenceTag': null,
         'currentReference': false,
         'events': {
-            'click > .no-session .sign-in': function () {
-                App.session.signin();
-            },
-            'click > .no-session .sign-up': function () {
-                App.session.signup();
-            },
             'click > .ticker > .message > .context-menu > .item.twitter': function (e) {
                 // TODO move social features out
-                var url = 'https://twitter.com/intent/tweet/?text='
-                    + $(e.target).parents('.message').find('.body > .content').text()
-                    + ' ' + window.location.href
-                    + ' @commonecoute';
+                // TODO add reference and username (if possible get user @twitter)
+                var url = 'https://twitter.com/intent/tweet/?text=' +
+                    escape($(e.target).parents('.message').find('.text > .content').text() +
+                    ' ' + window.location.href +
+                    ' @commonecoute');
                 window.open(url);
 
                 return false;
@@ -37,19 +32,17 @@ define([
             'click > .ticker.global > .badge': function (e) {
                 this.trigger('ticker::user::show', e.currentTarget.getAttribute('data-user-id'));
             },
-            /* TODO plug back reply for next milestone (1.1)
-            'click > .ticker.user > .message': function (e) {
-                this.trigger('ticker::message::show', e.currentTarget.getAttribute('data-message-id'));
-            },
-            */
-            'click > .ticker > .message > .body > .reference': function (e) {
-                this.trigger('message::seek', parseInt($(e.currentTarget).attr('data-reference'), 10));
-            },
-            'focus textarea': function () {
-                if (! App.session.isValid()) {
-                    this.showLogin();
+            'click > .ticker > .message > .text > .reference': function (e) {
+                App.mediator.emit('user::messages::seek', parseInt($(e.currentTarget).attr('data-reference'), 10));
 
-                    return true;
+                return false;
+            },
+            'focus textarea': function (e) {
+                if (! App.session.isValid()) {
+                    App.session.signin();
+                    e.target.blur();
+
+                    return false;
                 }
 
                 this.$el.addClass('on');
@@ -68,8 +61,8 @@ define([
                     return;
                 }
 
-                this.trigger(
-                    'message::new',
+                App.mediator.emit(
+                    'user::messages::create',
                     e.target.value,
                     this.currentReference
                 );
@@ -85,8 +78,6 @@ define([
         'initialize': function () {
             this.$el.html(_.template(tpl, {'currentLength': this.maxCharAllowed}));
             this.referenceTag = this.$el.find('> .form > .reference');
-
-            App.mediator.on('user::signin::success', this.hideLogin, this);
         },
         'updateCounter': function (count) {
             var counter = this.$el.find('> .form > .counter');
@@ -128,16 +119,6 @@ define([
                 ticker.hideRight();
             }
             ticker.$el.appendTo(this.$el);
-        },
-        'showLogin': function () {
-            // TODO move out sign-in/up process
-            this.$el.find('> .form > textarea').blur();
-            this.$el.children('.no-session').addClass('on');
-        },
-        'hideLogin': function () {
-            // TODO move out sign-in/up process
-            this.$el.find('> .form > textarea').focus();
-            this.$el.children('.no-session').removeClass('on');
         },
         'render': function () {
             return this;

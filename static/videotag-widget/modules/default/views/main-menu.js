@@ -1,8 +1,9 @@
 /*global define*/
 
 define([
+    'app',
     'modules/default/views/menu',
-], function (DefaultViewsMenu) {
+], function (App, DefaultViewsMenu) {
     'use strict';
 
     return DefaultViewsMenu.extend({
@@ -18,15 +19,7 @@ define([
                 }
             },
             'click > .item.back': function () {
-                if (! this.options.back || this.history.length === 0) {
-                    return;
-                }
-
-                this.history.pop()();
-
-                if (this.history.length === 0) {
-                    this.hide('back');
-                }
+                this.back();
             }
         },
         'initialize': function () {
@@ -39,14 +32,14 @@ define([
             }
         },
         'render': function () {
-            App.mediator.on('user::signin::success', function () {
+            App.mediator.on('user::session::signin', function () {
                 this.update('session', {
                     'title': 'sign out', // TODO i18n
                     'className': 'on'
                 });
             }, this);
 
-            App.mediator.on('user::signout::success', function () {
+            App.mediator.on('user::session::signout', function () {
                 this.update('session', {
                     'title': 'sign in', // TODO i18n
                     'className': '-on'
@@ -56,6 +49,22 @@ define([
             this.add('session', {'title': 'sign in'});
 
             return this;
+        },
+        'pushHistory': function (callback) {
+            this.history.push(callback);
+
+            this.show('back');
+        },
+        'back': function () {
+            if (! this.options.back || this.history.length === 0) {
+                return;
+            }
+
+            this.history.pop()();
+
+            if (this.history.length === 0) {
+                this.hide('back');
+            }
         }
     });
 });

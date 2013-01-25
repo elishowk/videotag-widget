@@ -15,7 +15,7 @@ define([
         'messages': {},
         'collection': null,
         'initialize': function () {
-            this.collection = new FeedsCollectionsMessage();
+            this.collection = new FeedsCollectionsMessage(null, {'feedId': App.config.feedId});
 
             if (this.comparator) {
                 this.collection.comparator = this.comparator;
@@ -23,6 +23,9 @@ define([
 
             this.collection.on('add', function (messageModel) {
                 this.pushMessage(messageModel);
+            }, this);
+            this.collection.on('remove', function (messageModel) {
+                this.removeMessage(messageModel);
             }, this);
         },
         'hideRight': function () {
@@ -42,5 +45,7 @@ define([
 
             return this;
         },
+        // by default does nothing
+        'removeMessage': function () {}
     });
 });

@@ -1,35 +1,83 @@
 /*global define*/
 
-define(['modules/feeds/models/abstract'], function (FeedsAbstractModel) {
+define(['modules/feeds/models/abstract'], function (FeedsModelsAbstract) {
     'use strict';
 
-    return FeedsAbstractModel.extend({
-        // TODO get properly `liked by user` value in `initialize`
-        'liked': false,
-        'like': function (options) {
-            if (this.liked) {
-                return this.unlike(options);
+    return FeedsModelsAbstract.extend({
+        'urlRoot': App.config.feedsApiUrl + '/message/',
+        'likeCount': 0,
+        'likeUser': false,
+        'parse': function (data) {
+            if (! data) {
+                return data;
             }
 
-            this.liked = true;
-            this.get('metadata').like += 1;
-            // TODO plug back when feeds done
-            //this.save(options);
-            this.trigger('change:like');
+            this.likeCount = data['like_count'];
+            delete data['like_count'];
 
-            return this;
-        },
-        'unlike': function (options) {
-            this.liked = false;
-            this.get('metadata').like -= 1;
-            // TODO plug back when feeds done
-            //this.save(options);
-            this.trigger('change:like');
+            this.likeUser = data['like_user'];
+            delete data['like_user'];
 
-            return this;
+            return FeedsModelsAbstract.prototype.parse.call(this, data);
         },
-        'isLikedByUser': function () {
-            return this.liked;
+        'initialize': function () {
+            var updateLike = function (data) {
+                this.likeCount = data['reference'];
+                this.trigger('change:like');
+            };
+
+            App.mediator.on('feeds::messages::like::' + this.get('id'), updateLike, this);
+
+            this.on('destroy', function () {
+                App.mediator.off('feeds::messages::like::' + this.get('id'), updateLike, this);
+                // TODO purge likes
+            }, this);
+        },
+        'like': function (options) {
+            if (! App.session.isValid()) {
+                return App.session.signin();
+            }
+
+            if (this.likeUser) {
+                $.ajax({
+                    'url': App.config.feedsApiUrl + '/like/' + this.likeUser,
+                    'type': 'DELETE',
+                    'dataType': 'json',
+                    'contentType': 'application/json',
+                    'success': function () {
+                        this.likeUser = false;
+                        this.trigger('change:like');
+                    }.bind(this)
+                });
+            } else {
+                $.ajax({
+                    'url': App.config.feedsApiUrl + '/like/',
+                    'type': 'POST',
+                    'dataType': 'json',
+                    'contentType': 'application/json',
+                    'data': JSON.stringify({
+                        'action': 'message.like',
+                        'feed': App.config.feedId,
+                        'parent': this.get('id')
+                    }),
+                    'success': function (data) {
+                        this.likeUser = data.id;
+                        this.trigger('change:like');
+                    }.bind(this)
+                });
+            }
+        },
+        'fetchUser': function (callback) {
+            var userModel = App.dataMap.users.get(this.get('created_by'));
+
+            if (userModel instanceof App.dataMap.users.model) {
+                return callback(userModel);
+            }
+
+            userModel = new App.dataMap.users.model({'id': this.get('created_by')});
+            userModel.fetch({'success': function () {
+                callback(userModel);
+            }});
         }
     });
 });

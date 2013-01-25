@@ -1,12 +1,17 @@
 /*global define*/
 
 define([
-    'backbone',
+    'modules/feeds/collections/abstract',
     'modules/feeds/models/message'
-], function (Backbone, MessageModel) {
+], function (FeedsCollectionsAbstract, MessageModel) {
     'use strict';
 
-    return Backbone.Collection.extend({
-        'model': MessageModel
+    return FeedsCollectionsAbstract.extend({
+        'urlRoot': App.config.feedsApiUrl + '/message/',
+        'model': MessageModel,
+        'initialize': function (models, options) {
+            this.filters.action = 'message.self';
+            this.filters.feed = options.feedId;
+        }
     });
 });

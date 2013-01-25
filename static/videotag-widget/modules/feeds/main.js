@@ -1,37 +1,42 @@
 /*global define, _*/
 
 define([
-    'Backbone',
-    'feeds/feeds'
-], function (Backbone, feeds) {
+    'app',
+    'backbone',
+    'feeds/feeds',
+], function (
+    App,
+    Backbone,
+    feeds
+) {
     'use strict';
 
     var Feeds = function () {};
-    var poserFeeds = feeds(require.appConfig.sockjsUrl);
+    var poserFeeds = feeds(App.config.sockjsUrl);
 
     _.extend(Feeds.prototype, Backbone.Events, {
         'feeds': {},
         'initialize': function () {
-            var countFeedReady = 1;
-            var onFeedReady = function () {
-                countFeedReady -= 1;
-
-                if (! countFeedReady) {
-                    this.trigger('ready');
-                }
-            }.bind(this);
-
             poserFeeds.initialize(function () {
-                this.feeds.user = poserFeeds.feed('user');
-                this.feeds.user.on('feed.join', onFeedReady);
-                this.feeds.user.join();
-
-                this.feeds.message = poserFeeds.feed('message');
-                this.feeds.message.on('feed.join', onFeedReady);
-                this.feeds.message.join();
+                this.feeds.messages = poserFeeds.feed(App.config.feedId);
+                this.feeds.messages.on('join', function () {
+                    this.trigger('ready');
+                }.bind(this));
+                this.feeds.messages.on('message.self', function (data) {
+                    App.mediator.emit('feeds::messages::create::' + data.id, data);
+                });
+                this.feeds.messages.on('message.self.delete', function (data) {
+                    App.mediator.emit('feeds::messages::remove::' + data.id, data);
+                });
+                this.feeds.messages.on('message.like', function (data) {
+                    App.mediator.emit('feeds::messages::like::' + data.parent, data);
+                });
+                this.feeds.messages.on('message.like.delete', function (data) {
+                    App.mediator.emit('feeds::messages::like::' + data.parent, data);
+                });
+                this.feeds.messages.join();
             }.bind(this));
-        }
+        },
     });
-
-    return (new Feeds());
+    return Feeds;
 });

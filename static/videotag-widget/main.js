@@ -7,39 +7,50 @@ require.config({
         'i18n':         'lib/require-i18n-2.0.1.min',
         'noext':        'lib/require-noext-0.3.1.min',
         'backbone':     'lib/backbone-0.9.9.min',
-        'jquery':       'lib/jquery-1.8.3.min',
-        'underscore':   'lib/lodash-1.0.0.min',
-        'setimmediate': 'lib/setimmediate-1.0.1.min',
-        'root':         'videotag-widget',
         'app':          'videotag-widget/app',
         'modules':      'videotag-widget/modules',
     },
     'shim': {
-        'app': {
-            'deps': ['setimmediate']
-        },
         'backbone': {
             'deps': [
-                'underscore',
-                'jquery'
+                'lib/lodash-1.0.0.min',
+                'lib/jquery-1.8.3.min',
             ],
             'exports': 'Backbone'
         },
         'youtube-player-api': {
             'exports': 'YT'
         },
-    },
+        'app': {
+            'deps': [
+                'poser/backbone-tastypie-0.1',
+                'lib/setimmediate-1.0.1.min'
+            ]
+        }
+    }
 });
 
 define([
     'app',
-    'poser/backbone-tastypie-0.1'
-], function (App) {
+    'modules/config/main'
+], function (App, Config) {
     'use strict';
 
-    App.on('ready', function () {
-        $(document.body).append(App.view.$el);
-        console.log('APP LOADED');
-    });
-    App.initialize();
+    var config = new Config();
+
+    // getting the csrf token (django === ugly)
+    $('<iframe style="display: none">')
+        .on('load', function () {
+            App.on('ready', function () {
+                $(document.body).append(App.view.$el);
+                console.log('APP READY');
+            });
+            config.on('ready', function () {
+                App.config = config.data;
+                App.initialize();
+            });
+            config.initialize()
+        })
+        .attr('src', window.location.origin)
+        .appendTo(document.body)
 });

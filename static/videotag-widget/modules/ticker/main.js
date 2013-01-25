@@ -5,15 +5,13 @@ define([
     'backbone',
     'modules/ticker/views/main',
     'modules/ticker/views/global',
-    'modules/ticker/views/user',
-    'modules/ticker/views/reply',
+    'modules/ticker/views/user'
 ], function (
     App,
     Backbone,
     TickerViewsMain,
     TickerViewsGlobal,
-    TickerViewsUser,
-    TickerViewsReply
+    TickerViewsUser
 ) {
     'use strict';
 
@@ -30,21 +28,21 @@ define([
             this.currentTicker = this.globalTicker;
 
             this.view = new TickerViewsMain();
-            this.view.on('message::seek', function (reference) {
+            App.mediator.on('user::messages::seek', function (reference) {
                 App.mediator.emit('player::seek', reference);
             }, this);
-            this.view.on('message::new', function (body, reference) {
-                var data = {
-                    'body': body,
-                    'reference': reference
-                };
-
-                if (this.currentTicker instanceof TickerViewsReply) {
-                    data.replyTo = this.currentTicker.model.get('id');
-                }
-
-                App.mediator.emit('feeds::message::new', data);
-            }, this);
+            App.mediator.on('user::messages::create', function (text, reference) {
+                // Do *NOT* use Backbone.Collection.create
+                var model = new App.dataMap.messages.model({
+                    'action': 'message.self',
+                    'feed': App.config.feedId,
+                    'reference': reference + '',
+                    'metadata': JSON.stringify({
+                        'text': text + ''
+                    })
+                });
+                model.save();
+            });
             this.view.on('ticker::user::show', function (userId) {
                 this.globalTicker.hideLeft();
                 this.currentTicker = this.getTicker('user', userId).show();
@@ -52,33 +50,26 @@ define([
                     'show': this.globalTicker,
                     'hide': this.currentTicker,
                 });
-                App.menu.back(function () {
+                App.menu.pushHistory(function () {
                     var tickers = this.history.pop();
                     tickers['show'].show();
                     tickers['hide'].hideRight();
                 }.bind(this));
             }, this);
-            /* TODO plug back reply for next milestone (1.1)
-            this.view.on('ticker::message::show', function (messageId) {
-                this.currentTicker.hideLeft();
-                this.currentTicker = this.getTicker('reply', messageId).show();
-            }, this);
-            */
             this.view.render();
             this.view.appendTicker(this.globalTicker, true);
 
-            App.mediator.on('player::currentReference', function (reference) {
+            App.mediator.on('player::reference::current', function (reference) {
                 this.view.updateReference(reference);
             }, this);
-            App.mediator.on('feeds::message::user', function (model, userId) {
+            App.mediator.on('datamap::messages::create', function (model, userId) {
                 this.globalTicker.collection.add(model);
                 this.getTicker('user', userId).collection.add(model);
             }, this);
-            /* TODO plug back reply for next milestone (1.1)
-            App.mediator.on('feeds::message::reply', function (model, messageId) {
-                this.getTicker('reply', messageId).collection.add(model);
+            App.mediator.on('datamap::messages::remove', function (model, userId) {
+                this.globalTicker.collection.remove(model);
+                this.getTicker('user', userId).collection.remove(model);
             }, this);
-            */
 
             this.trigger('ready');
         },
@@ -93,8 +84,8 @@ define([
             if (type === 'user') {
                 ticker = new TickerViewsUser({'tickerId': tickerId});
             } else {
-                ticker = new TickerViewsReply({'tickerId': tickerId});
-            }
+				// TODO add reply type later
+			}
 
             this.view.appendTicker(ticker);
 

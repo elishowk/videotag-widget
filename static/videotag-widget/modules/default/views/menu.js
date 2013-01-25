@@ -66,11 +66,6 @@ define(['backbone'], function (Backbone) {
             this.$el.children('.item.' + item).remove();
 
             return this;
-        },
-        'back': function (callback) {
-            this.history.push(callback);
-
-            this.show('back');
         }
     });
 });

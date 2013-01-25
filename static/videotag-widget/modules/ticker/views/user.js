@@ -24,6 +24,24 @@ define([
 
             return this;
         },
+        'removeMessage': function (messageModel) {
+            var messageId = messageModel.get('id');
+
+            if (! this.messages[messageId]) {
+                return this;
+            }
+
+            this.messages[messageId].remove();
+            this.messages[messageId] = null;
+
+            if (! _.some(this.messages)) {
+                return App.menu.back();
+            }
+
+            this.sort();
+
+            return this;
+        },
         'sort': function () {
             var models = this.collection.models;
 

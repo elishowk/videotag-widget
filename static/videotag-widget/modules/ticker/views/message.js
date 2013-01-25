@@ -23,6 +23,8 @@ define([
         'events': {
             'click > .context-menu > .item.delete': function () {
                 this.model.destroy();
+
+                return false;
             },
             'click > .context-menu > .item.like': function () {
                 this.model.like();
@@ -31,18 +33,19 @@ define([
             }
         },
         'initialize': function () {
-            this.build();
-        },
-        'build': function () {
-            if (App.session.isValid() && this.model.get('created_by') === App.session.get('userId')) {
+            if (App.session.isValid() && this.model.get('created_by') === App.session.user.get('id')) {
                 this.$el.addClass('my');
             }
 
             this.model.on('change:like', function () {
-                this.menu.update('like', {'className': this.model.isLikedByUser() ? 'on' : '-on'});
+                this.menu.update('like', {
+                    'className': (this.model.likeUser ? 'red ' : '-red ') +
+                        (this.model.likeCount > 0 ? 'on' : '-on')
+                });
             }, this);
 
-            App.mediator.on('player::currentReference', function (reference) {
+            // TODO move up (ticker/views/user or even ticker/views/main)
+            App.mediator.on('player::reference::current', function (reference) {
                 if (reference < this.model.get('reference')) {
                     this.hide();
                 } else {
@@ -52,23 +55,24 @@ define([
         },
         'buildMenu': function () {
             this.menu = new DefaultViewsMenu();
-            this.menu.add('delete')
+            this.menu.add('delete');
             this.menu.add('twitter');
-            this.menu.add('like', {
-                'className': this.model.isLikedByUser() ? 'on' : '',
-                'attrs': {'data-like-count': this.model.get('metadata').liked}
-            });
+            this.menu.add('like');
 
             this.$el.append(this.menu.$el);
         },
         'render': function () {
-            this.$el.attr('id', 'message-' + this.model.get('id'));
-            this.$el.html(_.template(tpl, {
-                'model': this.model,
-                'Format': Format
-            }));
+            this.model.fetchUser(function (userModel) {
+                this.$el
+                    .attr('id', 'message-' + this.model.get('id'))
+                    .html(_.template(tpl, {
+                        'model': this.model,
+                        'user': userModel,
+                        'Format': Format
+                    }));
 
-            this.buildMenu();
+                this.buildMenu();
+            }.bind(this));
 
             return this;
         },

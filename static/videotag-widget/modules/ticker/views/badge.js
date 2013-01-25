@@ -20,33 +20,19 @@ define([
         'collection': null,
         'model': null,
         'updateThrottle': 1000,
-        'timeRange': 60 * 3,
-        'build': function () {
-            this.collection = new FeedsCollectionsMessage(null, {
-                'comparator': function (model) {
-                    return -model.get('reference');
-                }
-            });
-
-            App.mediator.on('player::currentReference', _.throttle(function (reference) {
-                this.render(reference);
+        'initialize': function () {
+            App.mediator.on('player::reference::current', _.throttle(function () {
+                this.render();
             }, this.updateThrottle), this);
         },
-        'pushModel': function (model) {
-            this.collection.add(model);
-
-            return this;
-        },
-        'checkReferenceRange': function (messageReference, globalReference) {
-            return messageReference >= (globalReference - this.timeRange) && messageReference <= globalReference;
-        },
-        'render': function (reference) {
+        'render': function () {
             var models = this.collection.filter(function (model) {
-                return this.checkReferenceRange(model.get('reference'), reference);
+                var reference = model.get('reference');
+
+                return reference >= (App.currentReference - App.timeRange) && reference <= App.currentReference;
             }, this);
 
             if (models.length === 0) {
-                // TODO fix blink (when posting a new comment)
                 return this.hide();
             }
 
@@ -78,28 +64,31 @@ define([
             this.model = model;
             this.model.on('change:like', this.onLike, this);
 
-            window.setImmediate(function () {
-                if (App.session.isValid() && this.model.get('created_by') === App.session.get('userId')) {
-                    this.$el.addClass('my');
-                }
+            // TODO should *NOT* be able to see delete button after signout
+            if (App.session.isValid() && this.model.get('created_by') === App.session.user.get('id')) {
+                this.$el.addClass('my');
+            }
 
+            this.model.fetchUser(function (userModel) {
                 this.$el
                     .html(_.template(tpl, {
                         'model': this.model,
+                        'user': userModel,
                         'Format': Format
                     }))
-                    .attr({
-                        'data-user-id': this.model.get('created_by'),
-                        'data-message-id': this.model.get('id')
-                    });
+                    .attr('data-user-id', this.model.get('created_by'));
                 this.buildMenu();
+                this.onLike();
                 this.show();
             }.bind(this));
 
             return this;
         },
         'onLike': function () {
-            this.menu.update('like', {'className': this.model.isLikedByUser() ? 'on' : '-on'});
+            this.menu.update('like', {
+                'className': (this.model.likeUser ? 'red ' : '-red ') +
+                    (this.model.likeCount > 0 ? 'on' : '-on')
+            });
         },
         'show': function () {
             this.$el.addClass('on');
