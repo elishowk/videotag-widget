@@ -55,8 +55,6 @@ define([
             return this;
         },
         'getCurrentReference': function () {
-            // TODO remove post-debug
-            this.player.setVolume(0);
             return this.player.getCurrentTime();
         }
     });
