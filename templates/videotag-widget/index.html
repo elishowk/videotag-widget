@@ -1,12 +1,13 @@
-{% load static %}
+{% load static google_analytics %}
 {% load url from future %}
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta charset="utf-8" />
-        <title>CommonPlay Widget 1.0</title>
+        <title>CommonPlay</title>
         <link rel="stylesheet" href="{% get_static_prefix %}videotag-widget/css/reset.css" />
         <link rel="stylesheet" href="{% get_static_prefix %}videotag-widget/css/style.css" />
+        {% google_analytics %}
     </head>
     <body>
         <script>
@@ -48,5 +49,6 @@
                 document.head.appendChild(script);
             }).call(window);
         </script>
+        {% csrf_token %}
     </body>
 </html>
