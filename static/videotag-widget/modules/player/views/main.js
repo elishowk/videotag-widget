@@ -6,19 +6,14 @@ define([
     'use strict';
 
     return Backbone.View.extend({
-        'id': _.uniqueId('player_'),
+        'id': 'player' + ~~(Math.random() * 100000),
         'tagName': 'div',
-        'className': 'player',
         'render': function () {
             this.$el
-                .attr({
-                    'id': '',
-                    'class': ''
-                })
                 .wrap($('<div>')
-                    .attr('id', this.id)
+                    .attr('id',  _.uniqueId('player_'))
                     .addClass('type-' + this.options.type)
-                    .addClass(this.className)
+                    .addClass('player')
                 );
             this.setElement(this.$el.parent());
 

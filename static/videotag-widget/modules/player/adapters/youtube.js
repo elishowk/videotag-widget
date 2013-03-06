@@ -14,7 +14,7 @@ define([
             'width': 640,
             'height': 390
         },
-        'build': function (videoId, options) {
+        'build': function (videoUrl, options) {
             // Need to append to document for YT API to load
             this.options = _.defaults(options || {}, this.options);
             this.view = new PlayerViewsMain({
@@ -26,7 +26,7 @@ define([
                 this.player = new window.YT.Player(this.view.el, {
                     'width': this.options.width,
                     'height': this.options.height,
-                    'videoId': videoId,
+                    'videoId': this.getVideoId(videoUrl),
                     'events': {
                         'onReady': _.once(function (data) {
                             this.view.setElement(data.target.getIframe()).render();
@@ -38,6 +38,9 @@ define([
                     }
                 });
             }.bind(this);
+        },
+        'getVideoId': function(videoUrl) {
+            return videoUrl.replace(/.*((?:&|\?)v=([a-z0-9_-]+)).*/gi, '$2');
         },
         'play': function () {
             this.player.playVideo();

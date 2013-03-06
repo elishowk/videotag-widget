@@ -49,19 +49,41 @@ define([
                 this.dataMap = new DataMap();
                 this.dataMap.initialize();
 
-				App.mediator.on('feeds::messages::create', function (data) {
-					App.dataMap.messages.addById(data.id);
-				});
-				App.mediator.on('feeds::messages::remove', function (data) {
-					App.dataMap.messages.removeById(data.id);
-				});
+                App.mediator.on('feeds::messages::create', function (data) {
+                    App.dataMap.messages.addById(data.id);
+                });
+                App.mediator.on('feeds::messages::remove', function (data) {
+                    App.dataMap.messages.removeById(data.id);
+                });
+
+                /**
+                 * video adapter factory
+                 */
+                PlayerFactory.getPlayer(
+
+                  this.config.page.video, function(Player) {
+
+                    this.player = new Player();
+
+                    // callback when adapter is loaded
+                    this.player.once('ready', function () {
+                        this.view.render(this.player.view, 'left');
+                        this.trigger('moduleLoaded', 'player');
+                    }, this);
+
+                    this.mediator.on('player::reference::current', function (reference) {
+                        this.currentReference = reference;
+                    }, this);
+
+                    // TODO created_by conf
+                    this.player.initialize(this.config.page.video);
+                }.bind(this));
 
                 /**
                  * Modules
                  */
                 this.session = new SessionMain();
                 this.ticker = new Ticker();
-                this.player = new (PlayerFactory.getPlayer())();
                 this.feeds = new Feeds();
 
                 this.on('moduleLoaded', function (moduleName) {
@@ -89,16 +111,6 @@ define([
                     });
                     this.trigger('moduleLoaded', 'feeds');
                 }, this);
-
-                this.player.once('ready', function () {
-                    this.view.render(this.player.view, 'left');
-                    this.trigger('moduleLoaded', 'player');
-                }, this);
-                App.mediator.on('player::reference::current', function (reference) {
-                    this.currentReference = reference;
-                }, this);
-                // TODO created_by conf
-                this.player.initialize(this.config.page.videoId);
 
                 this.ticker.once('ready', function () {
                     this.view.render(this.ticker.view, 'right');

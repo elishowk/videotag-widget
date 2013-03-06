@@ -21,7 +21,6 @@ define([
                 'contentType': 'application/json',
                 'success': function (result) {
                     this.data.page = result;
-                    this.data.page.videoId = this.data.page.video.replace(/.*((?:&|\?)v=([a-z0-9_-]+)).*/gi, '$2');
                     this.trigger('ready');
                 }.bind(this)
             });

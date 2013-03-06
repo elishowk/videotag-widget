@@ -21,6 +21,9 @@ require.config({
         'youtube-player-api': {
             'exports': 'YT'
         },
+        'dailymotion-player-api': {
+            'exports': 'DM'
+        },
         'app': {
             'deps': [
                 'poser/backbone-tastypie-0.1',
